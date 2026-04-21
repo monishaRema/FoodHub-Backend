@@ -2,6 +2,7 @@ import { Response } from "express";
 import { config } from "../../config/env";
 import { JwtPayload } from "./auth.types";
 import jwt from "jsonwebtoken";
+import { CookieNameValue } from "./auth.controller";
 
 export const generateAccessToken = (payload: JwtPayload) => {
   const options: jwt.SignOptions = {
@@ -25,7 +26,7 @@ export const generateRefreshToken = (payload: JwtPayload) => {
 
 export const setCookie = (
   res: Response,
-  cookieName: string,
+  cookieName:CookieNameValue,
   token: string,
   age: number,
 ) => {
@@ -37,7 +38,7 @@ export const setCookie = (
   });
 };
 
-export const clearCookie = (res: Response, cookieName: string) => {
+export const clearCookie = (res: Response, cookieName: CookieNameValue) => {
   res.clearCookie(cookieName, {
     httpOnly: true,
     secure: config.isProduction,
