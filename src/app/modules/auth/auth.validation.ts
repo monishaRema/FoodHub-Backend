@@ -12,15 +12,14 @@ export const registerSchema = z.object({
     .string()
     .trim()
     .min(6, "Password must be at least 6 characters long"),
-  role: z.enum(["CUSTOMER", "PROVIDER"], "Role is required").catch(() => {
-    throw new z.ZodError([
-      {
-        code: "custom",
-        path: ["role"],
-        message: "Role must be CUSTOMER or PROVIDER",
-      },
-    ]);
-  }),
+  role: z
+    .string()
+    .trim()
+    .min(1, "Role is required")
+    .transform((value) => value.toUpperCase())
+    .pipe(
+      z.enum(["CUSTOMER", "PROVIDER"], "Role must be CUSTOMER or PROVIDER"),
+    ),
 
   phone: z
     .string()
