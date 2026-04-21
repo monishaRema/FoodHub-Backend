@@ -1,4 +1,4 @@
-import { email, nullish } from "zod";
+import jwt from "jsonwebtoken";
 import { AppError } from "../../../shared/error/AppError";
 import { config } from "../../config/env";
 import { authRepo } from "./auth.repository";
@@ -8,8 +8,7 @@ import { generateAccessToken, generateRefreshToken } from "./auth.utils";
 import { JwtPayload } from "./auth.types";
 
 export const authService = {
-
-    // Register user
+  // Register user
   register: async (payload: RegisterSchemaType) => {
     const existingUser = await authRepo.getUserByEmail(payload.email);
 
@@ -32,58 +31,86 @@ export const authService = {
       status: "ACTIVE",
     });
 
-    return user
+    return user;
   },
 
+  //    Login
+  login: async (payload: LoginSchemaType) => {
+    const existingUser = await authRepo.getUserByEmailWithPass(payload.email);
 
-    //    Login 
-  login: async (payload:LoginSchemaType) => {
-
-    const existingUser = await authRepo.getUserByEmailWithPass(payload.email)
-
-    if(!existingUser){
-        throw new AppError(401, "No user found with this email");
+    if (!existingUser) {
+      throw new AppError(401, "No user found with this email");
     }
 
-    if(existingUser.status !== "ACTIVE"){
-         throw new AppError(403, "This account is not allowed to log in");
+    if (existingUser.status !== "ACTIVE") {
+      throw new AppError(403, "This account is not allowed to log in");
     }
 
-    const isPasswordMatched = await bcrypt.compare(payload.password,existingUser.passwordHash)
+    const isPasswordMatched = await bcrypt.compare(
+      payload.password,
+      existingUser.passwordHash,
+    );
 
-    if(!isPasswordMatched){
-         throw new AppError(401, "Invalid password");
+    if (!isPasswordMatched) {
+      throw new AppError(401, "Invalid password");
     }
 
-    const jwtPayload:JwtPayload = {
-        userId:existingUser.id,
-        email:existingUser.email,
-        role:existingUser.role
-    }
+    const jwtPayload: JwtPayload = {
+      userId: existingUser.id,
+      email: existingUser.email,
+      role: existingUser.role,
+    };
 
-    const accessToken = generateAccessToken(jwtPayload)
-    const refreshToken = generateRefreshToken(jwtPayload)
-
-    
-
-
+    const accessToken = generateAccessToken(jwtPayload);
+    const refreshToken = generateRefreshToken(jwtPayload);
 
     return {
-    accessToken,
-    refreshToken,
+      accessToken,
+      refreshToken,
       user: {
-        id:existingUser.id,
-        name:existingUser.name,
-        email:existingUser.email,
-        role:existingUser.role,
-        status:existingUser.status,
-        phone:existingUser.phone,
-        image:existingUser.image,
-        createdAt:existingUser.createdAt,
-        updatedAt:existingUser.updatedAt,
-
+        id: existingUser.id,
+        name: existingUser.name,
+        email: existingUser.email,
+        role: existingUser.role,
+        status: existingUser.status,
+        phone: existingUser.phone,
+        image: existingUser.image,
+        createdAt: existingUser.createdAt,
+        updatedAt: existingUser.updatedAt,
       },
     };
+  },
+
+  // refresh token
+  refreshToken: async (token: string) => {
+    try {
+      const decoded = jwt.verify(
+        token,
+        config.JWT_REFRESH_TOKEN_SECRET,
+      ) as JwtPayload;
+
+      const user = await authRepo.getUserByEmail(decoded.email);
+
+      if (!user) {
+        throw new AppError(404, "User not found");
+      }
+
+      if (user?.status !== "ACTIVE") {
+        throw new AppError(403, "This account is not allowed");
+      }
+
+      const payload: JwtPayload = {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      };
+      const generatedToken = generateAccessToken(payload);
+
+      return generatedToken;
+    } catch (error) {
+      console.error(error);
+      throw new AppError(401, "Refresh token is invalid or expired");
+    }
   },
 
   getMe: async () => {},

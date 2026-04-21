@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { authService } from "./auth.service";
 import { sendResponse } from "../../../shared/utils/sendResponse";
 import { clearCookie, setCookie } from "./auth.utils";
+import { AppError } from "../../../shared/error/AppError";
 
 const cookieNames = {
   accessToken: "access-token",
@@ -56,7 +57,24 @@ export const authController = {
   },
 
   // Refresh Token
-  refreshToken: async (req: Request, res: Response) => {},
+  refreshToken: async (req: Request, res: Response) => {
+    const refreshToken = req.cookies[cookieNames.refreshToken]
+    
+    if(!refreshToken){
+       throw new AppError(401, "Refresh token required");
+    }
+
+    const token = await authService.refreshToken(refreshToken)
+
+    setCookie(res, cookieNames.accessToken, token, 60 * 60 * 1000)
+
+    sendResponse({
+      res,
+      statusCode: 200,
+      message: "token refreshed successfully",
+    });
+
+  },
 
   // Get my profile
   getMe: async (req: Request, res: Response) => {},
