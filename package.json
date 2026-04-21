@@ -4,8 +4,18 @@
   "description": "Discover & Order Delicious Meals",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/app/server.ts",
+    "type-check": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/app/server.js",
+    "p:format": "prisma format",
+    "p:validate": "prisma validate",
+    "p:gen": "prisma generate",
+    "p:migrate": "prisma migrate dev",
+    "p:deploy": "prisma migrate deploy",
+    "p:studio": "prisma studio"
   },
+  "types": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
