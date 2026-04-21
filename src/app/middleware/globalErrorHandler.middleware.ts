@@ -1,5 +1,6 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { AppError } from "../../shared/error/AppError";
+import z from "zod";
 
 type ResponseType<T = unknown> = {
   success: boolean;
@@ -20,9 +21,21 @@ export const globalErrorHandler: ErrorRequestHandler = (
   if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
-
     errorDetails = err.details ? err.details : undefined;
-  } else if (err instanceof Error) {
+
+  }
+  else if (err instanceof z.ZodError) {
+
+    statusCode = 400;
+    message = "Validation failed";
+    
+    errorDetails = err.issues.map((issue) => ({
+      field: issue.path.join("."),
+      message: issue.message,
+    }));
+
+  } 
+  else if (err instanceof Error) {
     message = err.message;
   }
 
@@ -32,7 +45,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
   };
 
   if (errorDetails !== undefined) {
-    response.errorDetails = err.details;
+    response.errorDetails = errorDetails;
   }
 
   res.status(statusCode).send(response);
