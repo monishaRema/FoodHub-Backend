@@ -3,6 +3,8 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { router } from "./router";
+import { globalErrorHandler } from "./middleware/globalErrorHandler.middleware";
+import { notFound } from "./middleware/notFound.middleware";
 
 export const app = express()
 
@@ -18,3 +20,7 @@ app.use(cookieParser())
 
 
 app.use("/api/v1",router)
+
+
+app.use(notFound)
+app.use(globalErrorHandler)
