@@ -1,3 +1,4 @@
+import { email } from 'zod';
 import { Prisma } from "../../../../generated/prisma/client";
 import { UserCreateInput } from "../../../../generated/prisma/models";
 import { prisma } from "../../../shared/lib/prisma";
@@ -29,17 +30,12 @@ export const authRepo = {
       },
     });
   },
-  getUserByIdWithPass: async (id: string) => {
+  getUserByEmailWithPass: async (email: string) => {
     return await prisma.user.findUnique({
       where: {
-        id,
+        email,
       },
-      select: {
-        id: true,
-        passwordHash: true,
-        role: true,
-        status: true,
-      },
+      
     });
   },
 
