@@ -86,5 +86,13 @@ export const authService = {
     };
   },
 
-  getMe: async () => {},
+  getMe: async (userId:string) => {
+      const user = await authRepo.getUserById(userId)
+
+  if(!user){
+    throw new AppError(404,"User not found with this id")
+  }
+
+  return user
+  },
 };

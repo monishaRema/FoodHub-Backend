@@ -39,6 +39,13 @@ export const authRepo = {
     });
   },
 
+  getUserById: async (id: string) => {
+  return prisma.user.findUnique({
+    where: { id },
+    select:safeUserSelect
+  });
+},
+
   register: async (data: UserCreateInput) => {
     return await prisma.user.create({
       data,
