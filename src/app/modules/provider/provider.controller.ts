@@ -26,7 +26,20 @@ export const providerController = {
     },
     
     // Create Meal
-    createMeal : async function(req:Request, res:Response) {},
+    createMeal : async function(req:Request, res:Response) {
+         if(!req.user){
+            throw new AppError(403, "Forbidden: You are not authorized")
+        }
+
+        const meal = await providerService.createMeal(req.body, req.user.userId)
+         sendResponse({
+            res,
+            statusCode:201,
+            message: "Meal created successfully",
+            data: meal
+        })
+
+    },
     
     // Get All Meal
     getMeals : async function(req:Request, res:Response) {},

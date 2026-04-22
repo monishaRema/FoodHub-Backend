@@ -1,4 +1,4 @@
-import { ProviderCreateManyInput } from "../../../../generated/prisma/models";
+import { MealCreateManyInput, ProviderCreateManyInput } from "../../../../generated/prisma/models";
 import { prisma } from "../../../shared/lib/prisma";
 
 export const providerRepo = {
@@ -32,7 +32,20 @@ export const providerRepo = {
   },
 
   // Create Meal
-  createMeal: async function () {},
+  createMeal: async function (data: MealCreateManyInput) {
+    return await prisma.meal.create({
+        data: data
+    })
+  },
+
+  getCategoryById: async function (id: string) {
+    return await prisma.category.findUnique({
+      where: {
+        id,
+      },
+    });
+  },
+
 
   // Get All Meal
   getMeals: async function () {},
