@@ -77,5 +77,18 @@ export const authController = {
   },
 
   // Get my profile
-  getMe: async (req: Request, res: Response) => {},
+  getMe: async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new AppError(401, "Unauthorized");
+    }
+
+    const user = await authService.getMe(req.user.userId);
+
+    sendResponse({
+      res,
+      statusCode: 200,
+      message: "Fetched user data successfully",
+      data: user,
+    });
+  },
 };
