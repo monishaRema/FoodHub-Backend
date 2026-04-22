@@ -27,7 +27,6 @@ export const authService = {
       passwordHash: passwordHash,
       phone: payload.phone || null,
       image: payload.image || null,
-      role: payload.role,
       status: "ACTIVE",
     });
 

@@ -12,6 +12,7 @@
     "p:validate": "prisma validate",
     "p:gen": "prisma generate",
     "p:migrate": "prisma migrate dev",
+    "p:reset": "prisma migrate reset",
     "p:deploy": "prisma migrate deploy",
     "p:studio": "prisma studio"
   },
