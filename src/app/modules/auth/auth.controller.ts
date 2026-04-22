@@ -3,14 +3,9 @@ import { authService } from "./auth.service";
 import { sendResponse } from "../../../shared/utils/sendResponse";
 import { clearCookie, setCookie } from "./auth.utils";
 import { AppError } from "../../../shared/error/AppError";
+import { cookieNames } from "../../constants";
 
-const cookieNames = {
-  accessToken: "access-token",
-  refreshToken: "refresh-token",
-} as const;
 
-export type CookieNameKey = keyof typeof cookieNames;
-export type CookieNameValue = (typeof cookieNames)[keyof typeof cookieNames];
 
 export const authController = {
   // Register

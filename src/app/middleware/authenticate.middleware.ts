@@ -4,13 +4,14 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/env";
 import { AppError } from "../../shared/error/AppError";
 import { JwtPayload } from "../modules/auth/auth.types";
+import { cookieNames } from "../constants";
 
 export const authenticate = (
   req: Request,
   _res: Response,
   next: NextFunction,
 ) => {
-  const accessToken = req.cookies["access-token"];
+  const accessToken = req.cookies[cookieNames.accessToken];
 
   if (!accessToken) {
     return next(new AppError(401, "Access token required"));
