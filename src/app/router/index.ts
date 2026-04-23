@@ -3,6 +3,8 @@ import { Request, Response, Router } from "express";
 import { sendResponse } from "../../shared/utils/sendResponse";
 import { authRouter } from "../modules/auth/auth.routes";
 import { providerRouter } from "../modules/provider/provider.route";
+import { providerPublicRouter } from '../modules/providers/providersPublic.routes';
+import { mealsRouter } from '../modules/meal/meal.routes';
 
 
 
@@ -19,4 +21,6 @@ router.get("/", (req:Request,res:Response) => {
 })
 
 router.use("/auth",authRouter)
+router.use("/meals", mealsRouter)
+router.use("/providers",providerPublicRouter)
 router.use("/provider",authenticate, providerRouter)

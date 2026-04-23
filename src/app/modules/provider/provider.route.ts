@@ -3,11 +3,11 @@ import { providerController } from "./provider.controller";
 import { validateRequest } from "../../middleware/validateRequest.middleware";
 import {
   createMealSchema,
-  idParamsSchema,
   registerProviderSchema,
   updateMealSchema,
 } from "./provider.validation";
 import { authorize } from "../../middleware/authorize.middleware";
+import { idParamsSchema } from "../../../shared/validation";
 
 export const providerRouter = Router();
 
