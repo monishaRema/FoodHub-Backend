@@ -1,4 +1,8 @@
-import { MealCreateManyInput, MealUncheckedUpdateInput, ProviderCreateManyInput } from "../../../../generated/prisma/models";
+import {
+  MealCreateManyInput,
+  MealUncheckedUpdateInput,
+  ProviderCreateManyInput,
+} from "../../../../generated/prisma/models";
 import { prisma } from "../../../shared/lib/prisma";
 
 export const providerRepo = {
@@ -18,8 +22,7 @@ export const providerRepo = {
         },
       });
 
-      return newProvider
-
+      return newProvider;
     });
   },
 
@@ -34,8 +37,8 @@ export const providerRepo = {
   // Create Meal
   createMeal: async function (data: MealCreateManyInput) {
     return await prisma.meal.create({
-        data: data
-    })
+      data: data,
+    });
   },
 
   getCategoryById: async function (id: string) {
@@ -46,40 +49,40 @@ export const providerRepo = {
     });
   },
 
-
   // Get All Meal
-  getMeals: async function () {
-
-    return await prisma.meal.findMany()
+  getMeals: async function (providerId: string) {
+    return await prisma.meal.findMany({
+      where: {
+        providerId,
+      },
+    });
   },
 
   // Get Single Meal
-  getSingleMeal: async function (id:string) {
+  getSingleMeal: async function (id: string) {
     return await prisma.meal.findUnique({
-      where:{
-        id
-      }
-    })
+      where: {
+        id,
+      },
+    });
   },
 
   // Update Meal
   updateMeal: async function (mealId: string, data: MealUncheckedUpdateInput) {
-  return await prisma.meal.update({
-    where: {
-      id: mealId,
-    },
-    data,
-  });
-},
+    return await prisma.meal.update({
+      where: {
+        id: mealId,
+      },
+      data,
+    });
+  },
 
   // Delete Meal
-  deleteMeal: async function (id:string) {
-
+  deleteMeal: async function (id: string) {
     return await prisma.meal.delete({
-      where:{
-        id
-      }
-    })
-
+      where: {
+        id,
+      },
+    });
   },
 };

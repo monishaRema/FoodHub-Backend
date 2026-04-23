@@ -73,72 +73,89 @@ export const providerService = {
   },
 
   // Get All Meal
-  getMeals: async function () {
-    return await providerRepo.getMeals();
+  getMeals: async function (userId: string) {
+    const provider = await providerRepo.getProviderByUserId(userId);
+
+    if (!provider) {
+      throw new AppError(404, "Provider not found with this user id");
+    }
+
+    return await providerRepo.getMeals(provider.id);
   },
 
   // Get Single Meal
-  getSingleMeal: async function (id: string) {
-    const meal = await providerRepo.getSingleMeal(id);
+  getSingleMeal: async function (mealId: string, userId: string) {
+    const provider = await providerRepo.getProviderByUserId(userId);
+
+    if (!provider) {
+      throw new AppError(404, "Provider not found with this user id");
+    }
+
+    const meal = await providerRepo.getSingleMeal(mealId);
 
     if (!meal) {
       throw new AppError(404, "Meal not found with this id");
+    }
+
+    if (meal.providerId !== provider.id) {
+      throw new AppError(403, "Forbidden: You can view only your own meal");
     }
 
     return meal;
   },
 
   // Update Meal
-  updateMeal: async function (mealId: string,
-  payload: UpdateMealSchemaType,
-  userId: string,) {
-  const provider = await providerRepo.getProviderByUserId(userId);
+  updateMeal: async function (
+    mealId: string,
+    payload: UpdateMealSchemaType,
+    userId: string,
+  ) {
+    const provider = await providerRepo.getProviderByUserId(userId);
 
-  if (!provider) {
-    throw new AppError(404, "Provider not found with this user id");
-  }
-
-  const existingMeal = await providerRepo.getSingleMeal(mealId);
-
-  if (!existingMeal) {
-    throw new AppError(404, "Meal not found with this id");
-  }
-
-  if (existingMeal.providerId !== provider.id) {
-    throw new AppError(403, "Forbidden: You can update only your own meal");
-  }
-
-  if (payload.categoryId) {
-    const category = await providerRepo.getCategoryById(payload.categoryId);
-
-    if (!category) {
-      throw new AppError(404, "Category not found with this category id");
+    if (!provider) {
+      throw new AppError(404, "Provider not found with this user id");
     }
-  }
 
-  
-  const updateData: MealUncheckedUpdateInput = {};
+    const existingMeal = await providerRepo.getSingleMeal(mealId);
 
-  if (payload.name !== undefined) updateData.name = payload.name;
-  if (payload.image !== undefined) updateData.image = payload.image;
-  if (payload.price !== undefined) updateData.price = payload.price;
-  if (payload.dietary !== undefined) updateData.dietary = payload.dietary;
-  if (payload.excerpt !== undefined) updateData.excerpt = payload.excerpt;
-  if (payload.details !== undefined) updateData.details = payload.details;
-  if (payload.isFeatured !== undefined) updateData.isFeatured = payload.isFeatured;
-  if (payload.availability !== undefined) updateData.availability = payload.availability;
-  if (payload.categoryId !== undefined) updateData.categoryId = payload.categoryId;
+    if (!existingMeal) {
+      throw new AppError(404, "Meal not found with this id");
+    }
 
-  const updatedMeal = await providerRepo.updateMeal(mealId, updateData);
+    if (existingMeal.providerId !== provider.id) {
+      throw new AppError(403, "Forbidden: You can update only your own meal");
+    }
 
-  return updatedMeal;
-  
-},
+    if (payload.categoryId) {
+      const category = await providerRepo.getCategoryById(payload.categoryId);
+
+      if (!category) {
+        throw new AppError(404, "Category not found with this category id");
+      }
+    }
+
+    const updateData: MealUncheckedUpdateInput = {};
+
+    if (payload.name !== undefined) updateData.name = payload.name;
+    if (payload.image !== undefined) updateData.image = payload.image;
+    if (payload.price !== undefined) updateData.price = payload.price;
+    if (payload.dietary !== undefined) updateData.dietary = payload.dietary;
+    if (payload.excerpt !== undefined) updateData.excerpt = payload.excerpt;
+    if (payload.details !== undefined) updateData.details = payload.details;
+    if (payload.isFeatured !== undefined)
+      updateData.isFeatured = payload.isFeatured;
+    if (payload.availability !== undefined)
+      updateData.availability = payload.availability;
+    if (payload.categoryId !== undefined)
+      updateData.categoryId = payload.categoryId;
+
+    const updatedMeal = await providerRepo.updateMeal(mealId, updateData);
+
+    return updatedMeal;
+  },
 
   // Delete Meal
   deleteMeal: async function (mealId: string, userId: string) {
-   
-
     const provider = await providerRepo.getProviderByUserId(userId);
     if (!provider) {
       throw new AppError(404, "Provider not found with this user id");

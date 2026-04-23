@@ -73,3 +73,10 @@ export const updateMealSchema = z
   });
 
 export type UpdateMealSchemaType = z.infer<typeof updateMealSchema>;
+
+
+export const idParamsSchema = z.object({
+  id: z.uuid("Kindly provide a valid id")
+})
+
+

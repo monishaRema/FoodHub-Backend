@@ -3,7 +3,9 @@ import { providerController } from "./provider.controller";
 import { validateRequest } from "../../middleware/validateRequest.middleware";
 import {
   createMealSchema,
+  idParamsSchema,
   registerProviderSchema,
+  updateMealSchema,
 } from "./provider.validation";
 import { authorize } from "../../middleware/authorize.middleware";
 
@@ -26,6 +28,7 @@ providerRouter.get(
 // GET /provider/meals/:id
 providerRouter.get(
   "/meals/:id",
+  validateRequest(idParamsSchema, "params"),
   authorize("PROVIDER"),
   providerController.getSingleMeal,
 );
@@ -41,6 +44,8 @@ providerRouter.post(
 // PATCH /provider/meals/:id
 providerRouter.patch(
   "/meals/:id",
+  validateRequest(idParamsSchema, "params"),
+  validateRequest(updateMealSchema, "body"),
   authorize("PROVIDER"),
   providerController.updateMeal,
 );
@@ -48,6 +53,7 @@ providerRouter.patch(
 // DELETE /provider/meals/:id
 providerRouter.delete(
   "/meals/:id",
+  validateRequest(idParamsSchema, "params"),
   authorize("PROVIDER"),
   providerController.deleteMeal,
 );
