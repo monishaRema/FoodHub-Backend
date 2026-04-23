@@ -1,10 +1,12 @@
 import { Prisma } from "../../../../generated/prisma/client";
+import { MealUncheckedUpdateInput } from "../../../../generated/prisma/models";
 
 import { AppError } from "../../../shared/error/AppError";
 import { providerRepo } from "./provider.repository";
 import {
   CreteMealSchemaType,
   RegisterProviderSchemaType,
+  UpdateMealSchemaType,
 } from "./provider.validation";
 
 export const providerService = {
@@ -67,43 +69,106 @@ export const providerService = {
       categoryId: category.id,
     });
 
-    return meal
+    return meal;
   },
 
   // Get All Meal
   getMeals: async function () {
-
-    return await providerRepo.getMeals()
+    return await providerRepo.getMeals();
   },
 
   // Get Single Meal
-  getSingleMeal: async function (id:string) {
+  getSingleMeal: async function (id: string) {
+    const meal = await providerRepo.getSingleMeal(id);
 
-    const meal = await providerRepo.getSingleMeal(id)
-
-    if(!meal){
-
-        throw new AppError(404, "Meal not found with this id");
+    if (!meal) {
+      throw new AppError(404, "Meal not found with this id");
     }
 
-    return meal
+    return meal;
   },
 
   // Update Meal
-  updateMeal: async function () {},
+  updateMeal: async function (mealId: string,
+  payload: UpdateMealSchemaType,
+  userId: string,) {
+  const provider = await providerRepo.getProviderByUserId(userId);
+
+  if (!provider) {
+    throw new AppError(404, "Provider not found with this user id");
+  }
+
+  const existingMeal = await providerRepo.getSingleMeal(mealId);
+
+  if (!existingMeal) {
+    throw new AppError(404, "Meal not found with this id");
+  }
+
+  if (existingMeal.providerId !== provider.id) {
+    throw new AppError(403, "Forbidden: You can update only your own meal");
+  }
+
+  if (payload.categoryId) {
+    const category = await providerRepo.getCategoryById(payload.categoryId);
+
+    if (!category) {
+      throw new AppError(404, "Category not found with this category id");
+    }
+  }
+
+  
+  const updateData: MealUncheckedUpdateInput = {};
+
+  if (payload.name !== undefined) updateData.name = payload.name;
+  if (payload.image !== undefined) updateData.image = payload.image;
+  if (payload.price !== undefined) updateData.price = payload.price;
+  if (payload.dietary !== undefined) updateData.dietary = payload.dietary;
+  if (payload.excerpt !== undefined) updateData.excerpt = payload.excerpt;
+  if (payload.details !== undefined) updateData.details = payload.details;
+  if (payload.isFeatured !== undefined) updateData.isFeatured = payload.isFeatured;
+  if (payload.availability !== undefined) updateData.availability = payload.availability;
+  if (payload.categoryId !== undefined) updateData.categoryId = payload.categoryId;
+
+  const updatedMeal = await providerRepo.updateMeal(mealId, updateData);
+
+  return updatedMeal;
+  
+},
 
   // Delete Meal
-  deleteMeal: async function (mealId:string,userId:string) {
+  deleteMeal: async function (mealId: string, userId: string) {
+   
 
-    //  
-    /**
-     * id = meal id
-     * 1. check if this meal id exists or not 
-     * 2. is this meal belongs to the right provider? provider can delete only his won meal
-     * 3. hit repo getProviderByUserId  with user id 
-     * 4. compare meal.provider id == provider.id
-     * 5. if matched then hit repo  deleteMeal
-     * 6. return to controller
-     */
+    const provider = await providerRepo.getProviderByUserId(userId);
+    if (!provider) {
+      throw new AppError(404, "Provider not found with this user id");
+    }
+
+    const meal = await providerRepo.getSingleMeal(mealId);
+
+    if (!meal) {
+      throw new AppError(404, "Meal not found with this id");
+    }
+
+    if (meal.providerId !== provider.id) {
+      throw new AppError(403, "Forbidden: You can delete only your own meal");
+    }
+
+    try {
+      const deletedMeal = await providerRepo.deleteMeal(mealId);
+      return deletedMeal;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2003"
+      ) {
+        throw new AppError(
+          409,
+          "This meal cannot be deleted because it is already used in orders",
+        );
+      }
+
+      throw error;
+    }
   },
 };

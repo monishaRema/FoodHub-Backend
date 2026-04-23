@@ -1,4 +1,4 @@
-import { MealCreateManyInput, ProviderCreateManyInput } from "../../../../generated/prisma/models";
+import { MealCreateManyInput, MealUncheckedUpdateInput, ProviderCreateManyInput } from "../../../../generated/prisma/models";
 import { prisma } from "../../../shared/lib/prisma";
 
 export const providerRepo = {
@@ -63,7 +63,14 @@ export const providerRepo = {
   },
 
   // Update Meal
-  updateMeal: async function () {},
+  updateMeal: async function (mealId: string, data: MealUncheckedUpdateInput) {
+  return await prisma.meal.update({
+    where: {
+      id: mealId,
+    },
+    data,
+  });
+},
 
   // Delete Meal
   deleteMeal: async function (id:string) {
