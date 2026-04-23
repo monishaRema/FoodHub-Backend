@@ -48,14 +48,31 @@ export const providerRepo = {
 
 
   // Get All Meal
-  getMeals: async function () {},
+  getMeals: async function () {
+
+    return await prisma.meal.findMany()
+  },
 
   // Get Single Meal
-  getSingleMeal: async function () {},
+  getSingleMeal: async function (id:string) {
+    return await prisma.meal.findUnique({
+      where:{
+        id
+      }
+    })
+  },
 
   // Update Meal
   updateMeal: async function () {},
 
   // Delete Meal
-  deleteMeal: async function () {},
+  deleteMeal: async function (id:string) {
+
+    return await prisma.meal.delete({
+      where:{
+        id
+      }
+    })
+
+  },
 };

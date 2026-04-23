@@ -71,14 +71,39 @@ export const providerService = {
   },
 
   // Get All Meal
-  getMeals: async function () {},
+  getMeals: async function () {
+
+    return await providerRepo.getMeals()
+  },
 
   // Get Single Meal
-  getSingleMeal: async function () {},
+  getSingleMeal: async function (id:string) {
+
+    const meal = await providerRepo.getSingleMeal(id)
+
+    if(!meal){
+
+        throw new AppError(404, "Meal not found with this id");
+    }
+
+    return meal
+  },
 
   // Update Meal
   updateMeal: async function () {},
 
   // Delete Meal
-  deleteMeal: async function () {},
+  deleteMeal: async function (mealId:string,userId:string) {
+
+    //  
+    /**
+     * id = meal id
+     * 1. check if this meal id exists or not 
+     * 2. is this meal belongs to the right provider? provider can delete only his won meal
+     * 3. hit repo getProviderByUserId  with user id 
+     * 4. compare meal.provider id == provider.id
+     * 5. if matched then hit repo  deleteMeal
+     * 6. return to controller
+     */
+  },
 };
