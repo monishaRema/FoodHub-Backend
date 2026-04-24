@@ -4,7 +4,7 @@ import { AppError } from "../../../shared/error/AppError";
 import { sendResponse } from "../../../shared/utils/sendResponse";
 
 export const categoryController = {
-  getCategories: async function (req: Request, res: Response) {
+  getCategories: async function (_req: Request, res: Response) {
     const categories = await categoryService.getCategories();
 
     if (!categories) {
@@ -17,7 +17,7 @@ export const categoryController = {
       data: categories,
     });
   },
-  getSingleCategory: async function (req: Request, res: Response) {
+  getSingleCategory: async function (_req: Request, res: Response) {
     if (!req.params.id) {
       throw new AppError(401, "Id is required");
     }
@@ -34,7 +34,7 @@ export const categoryController = {
     });
   },
 
-  createCategory: async function (req: Request, res: Response) {
+  createCategory: async function (_req: Request, res: Response) {
     const category = await categoryService.createCategory(res.locals.body);
 
     sendResponse({
@@ -45,7 +45,7 @@ export const categoryController = {
     });
   },
 
-  updateCategory: async function (req: Request, res: Response) {
+  updateCategory: async function (_req: Request, res: Response) {
     const category = await categoryService.updateCategory(
       res.locals.params.id,
       res.locals.body,
@@ -59,7 +59,7 @@ export const categoryController = {
     });
   },
 
-  deleteCategory: async function (req: Request, res: Response) {
+  deleteCategory: async function (_req: Request, res: Response) {
   const category = await categoryService.deleteCategory(res.locals.params.id);
 
   sendResponse({
