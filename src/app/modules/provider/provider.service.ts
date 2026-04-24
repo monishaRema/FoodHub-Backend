@@ -5,6 +5,7 @@ import { AppError } from "../../../shared/error/AppError";
 import { providerRepo } from "./provider.repository";
 import {
   CreteMealSchemaType,
+  ProviderMealQueryType,
   RegisterProviderSchemaType,
   UpdateMealSchemaType,
 } from "./provider.validation";
@@ -73,14 +74,18 @@ export const providerService = {
   },
 
   // Get All Meal
-  getMeals: async function (userId: string) {
+  getMeals: async function (userId: string, query: ProviderMealQueryType) {
     const provider = await providerRepo.getProviderByUserId(userId);
 
     if (!provider) {
       throw new AppError(404, "Provider not found with this user id");
     }
 
-    return await providerRepo.getMeals(provider.id);
+    const limit = query.limit ?? 10;
+    const page = query.page ?? 1;
+    const skip = (page - 1) * limit;
+
+    return await providerRepo.getMeals(provider.id, limit, skip);
   },
 
   // Get Single Meal

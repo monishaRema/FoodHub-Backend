@@ -1,4 +1,7 @@
-import { DietaryType, MealAvailability } from "../../../../generated/prisma/enums";
+import {
+  DietaryType,
+  MealAvailability,
+} from "../../../../generated/prisma/enums";
 import z from "zod";
 
 export const registerProviderSchema = z.object({
@@ -10,29 +13,31 @@ export const registerProviderSchema = z.object({
     .optional(),
 });
 
-
 export type RegisterProviderSchemaType = z.infer<typeof registerProviderSchema>;
-
 
 export const createMealSchema = z.object({
   name: z.string().trim().min(1, "Meal name is required"),
-  image: z
-    .string()
-    .pipe(z.url({ message: "Meal image must be a valid URL" })),
+  image: z.string().pipe(z.url({ message: "Meal image must be a valid URL" })),
   price: z.coerce.number().positive("Price must be greater than 0"),
   dietary: z.enum(DietaryType, {
     message: "Dietary type must be one of VEG, NON_VEG, or VEGAN",
   }),
-  excerpt: z.string().trim().min(1, "Meal excerpt is required").max(100, "Excerpt can not be more than 100 char"),
+  excerpt: z
+    .string()
+    .trim()
+    .min(1, "Meal excerpt is required")
+    .max(100, "Excerpt can not be more than 100 char"),
   details: z.string().trim().min(1, "Meal details is required"),
-  categoryId: z.string().pipe(z.uuid({message: "Invalid category id"})),
+  categoryId: z.string().pipe(z.uuid({ message: "Invalid category id" })),
   isFeatured: z.boolean().optional(),
-  availability: z.enum(MealAvailability, {
-    message: "Availability must be AVAILABLE or UNAVAILABLE",
-  }).optional(),
+  availability: z
+    .enum(MealAvailability, {
+      message: "Availability must be AVAILABLE or UNAVAILABLE",
+    })
+    .optional(),
 });
 
-export type CreteMealSchemaType = z.infer<typeof createMealSchema>
+export type CreteMealSchemaType = z.infer<typeof createMealSchema>;
 
 export const updateMealSchema = z
   .object({
@@ -74,7 +79,10 @@ export const updateMealSchema = z
 
 export type UpdateMealSchemaType = z.infer<typeof updateMealSchema>;
 
+export const providerMealQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(10),
+});
 
 
-
-
+export type ProviderMealQueryType = z.infer<typeof providerMealQuerySchema>

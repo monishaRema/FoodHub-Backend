@@ -13,6 +13,7 @@ export const providerController = {
     const provider = await providerService.registerProvider(
       req.body,
       req.user.userId,
+      
     );
 
     sendResponse({
@@ -44,7 +45,7 @@ export const providerController = {
       throw new AppError(403, "Forbidden: You are not authorized");
     }
 
-    const meals = await providerService.getMeals(req.user.userId);
+    const meals = await providerService.getMeals(req.user.userId,res.locals.query);
     sendResponse({
       res,
       statusCode: 200,

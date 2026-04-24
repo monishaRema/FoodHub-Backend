@@ -3,6 +3,7 @@ import { providerController } from "./provider.controller";
 import { validateRequest } from "../../middleware/validateRequest.middleware";
 import {
   createMealSchema,
+  providerMealQuerySchema,
   registerProviderSchema,
   updateMealSchema,
 } from "./provider.validation";
@@ -22,6 +23,7 @@ providerRouter.post(
 providerRouter.get(
   "/meals",
   authorize("PROVIDER"),
+  validateRequest(providerMealQuerySchema,"query"),
   providerController.getMeals,
 );
 

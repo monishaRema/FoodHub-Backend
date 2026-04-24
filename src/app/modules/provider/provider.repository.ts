@@ -50,10 +50,15 @@ export const providerRepo = {
   },
 
   // Get All Meal
-  getMeals: async function (providerId: string) {
+  getMeals: async function (providerId: string,take:number,skip:number) {
     return await prisma.meal.findMany({
       where: {
         providerId,
+      },
+      take: take,
+      skip: skip,
+      orderBy: {
+        createdAt: "desc",
       },
     });
   },
