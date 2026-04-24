@@ -5,22 +5,30 @@ import { idParamsSchema } from "../../../shared/validation";
 import { categoryController } from "./category.controller";
 import { categorySchema, updateCategorySchema } from "./category.validation";
 
-export const categoryRouter = Router()
+export const categoryRouter = Router();
 
-categoryRouter.get("/", categoryController.getCategories)
-categoryRouter.get("/:id", validateRequest(idParamsSchema, "params"), categoryController.getSingleCategory)
+categoryRouter.get("/", categoryController.getCategories);
+categoryRouter.get(
+  "/:id",
+  validateRequest(idParamsSchema, "params"),
+  categoryController.getSingleCategory,
+);
 categoryRouter.post(
   "/",
   authorize("ADMIN"),
   validateRequest(categorySchema, "body"),
-  categoryController.createCategory
+  categoryController.createCategory,
 );
-categoryRouter.patch("/:id",authorize("ADMIN"),validateRequest(idParamsSchema,"params"),validateRequest(updateCategorySchema,"body"),categoryController.updateCategory)
+categoryRouter.patch(
+  "/:id",
+  authorize("ADMIN"),
+  validateRequest(idParamsSchema, "params"),
+  validateRequest(updateCategorySchema, "body"),
+  categoryController.updateCategory,
+);
 categoryRouter.delete(
   "/:id",
   authorize("ADMIN"),
   validateRequest(idParamsSchema, "params"),
-  categoryController.deleteCategory
+  categoryController.deleteCategory,
 );
-
-
