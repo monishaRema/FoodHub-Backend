@@ -5,7 +5,8 @@ import { AppError } from "../../../shared/error/AppError";
 
 export const mealsController = {
   getMeals: async function (req: Request, res: Response) {
-    const meals = await mealsService.getMeals();
+
+    const meals = await mealsService.getMeals(res.locals.query);
 
     sendResponse({
       res,
