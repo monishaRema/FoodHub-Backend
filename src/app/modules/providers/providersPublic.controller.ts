@@ -5,7 +5,10 @@ import { AppError } from "../../../shared/error/AppError";
 
 export const providersPublicController = {
   getProviders: async function (req: Request, res: Response) {
-    const providers = await providersPublicService.getProviders();
+
+
+
+    const providers = await providersPublicService.getProviders(res.locals.query);
 
     sendResponse({
       res,

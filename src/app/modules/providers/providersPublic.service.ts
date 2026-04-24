@@ -1,9 +1,20 @@
 import { AppError } from "../../../shared/error/AppError";
+import { ProviderQueryType } from "./providerPublic.validation";
 import { providersPublicRepo } from "./providersPublic.repository";
 
 export const providersPublicService = {
-  getProviders: async function () {
-    return await providersPublicRepo.getProviders();
+  getProviders: async function (query: ProviderQueryType) {
+    const limit = query.limit ?? 10;
+    const page = query.page ?? 1;
+    const skip = (page - 1) * limit;
+
+    return await providersPublicRepo.getProviders({
+      take: limit,
+      skip: skip,
+      sortBy: query.sortBy,
+      SortOrder: query.sortOrder,
+      search: query.search || null,
+    });
   },
   getSingleProvider: async function (id: string) {
     const provider = await providersPublicRepo.getSingleProvider(id);
