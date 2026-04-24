@@ -5,6 +5,7 @@ import { authRouter } from "../modules/auth/auth.routes";
 import { providerRouter } from "../modules/provider/provider.route";
 import { providerPublicRouter } from '../modules/providers/providersPublic.routes';
 import { mealsRouter } from '../modules/meal/meal.routes';
+import { categoryRouter } from '../modules/category/category.routes';
 
 
 
@@ -24,3 +25,4 @@ router.use("/auth",authRouter)
 router.use("/meals", mealsRouter)
 router.use("/providers",providerPublicRouter)
 router.use("/provider",authenticate, providerRouter)
+router.use("/category",authenticate,categoryRouter)

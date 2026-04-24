@@ -18,13 +18,8 @@ export const validateRequest = (
       return next(new AppError(400, "Validation failed", formateError));
     }
 
-    
-    if (reqParts === "query") {
-      res.locals.query ??= {};
-      res.locals.query = parsedRequest.data;
-    }else{
-       req[reqParts] = parsedRequest.data;
-    }
+    res.locals[reqParts] = parsedRequest.data;
+    req[reqParts] = parsedRequest.data;
 
 
 
