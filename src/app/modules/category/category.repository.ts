@@ -39,6 +39,15 @@ export const categoryRepo = {
     });
   },
 
+
+  getMealsCountByCategory: async function(categoryId:string){
+    return await prisma.meal.count({
+      where: {
+        categoryId: categoryId
+      }
+    })
+  },
+
   deleteCategory: async function (id: string) {
   return await prisma.category.delete({
     where: {

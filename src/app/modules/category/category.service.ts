@@ -26,29 +26,33 @@ export const categoryService = {
   },
 
   updateCategory: async function (id: string, data: { name: string }) {
-  const isCategoryExists = await categoryRepo.getSingleCategory(id);
+    const isCategoryExists = await categoryRepo.getSingleCategory(id);
 
-  if (!isCategoryExists) {
-    throw new AppError(404, "Category not found with this id");
-  }
+    if (!isCategoryExists) {
+      throw new AppError(404, "Category not found with this id");
+    }
 
-  const isNameTaken = await categoryRepo.getCategoryByName(data.name);
+    const isNameTaken = await categoryRepo.getCategoryByName(data.name);
 
-  if (isNameTaken && isNameTaken.id !== id) {
-    throw new AppError(409, "Category name already exists");
-  }
+    if (isNameTaken && isNameTaken.id !== id) {
+      throw new AppError(409, "Category name already exists");
+    }
 
-  return await categoryRepo.updateCategory(id, data);
-},
+    return await categoryRepo.updateCategory(id, data);
+  },
 
-deleteCategory: async function (id: string) {
-  const isCategoryExists = await categoryRepo.getSingleCategory(id);
+  deleteCategory: async function (id: string) {
+    const isCategoryExists = await categoryRepo.getSingleCategory(id);
 
-  if (!isCategoryExists) {
-    throw new AppError(404, "Category not found with this id");
-  }
+    if (!isCategoryExists) {
+      throw new AppError(404, "Category not found");
+    }
 
-  return await categoryRepo.deleteCategory(id);
-},
-  
+    const mealCount = await categoryRepo.getMealsCountByCategory(id);
+    if (mealCount > 0) {
+      throw new AppError(409, "Cannot delete category with existing meals");
+    }
+
+    return await categoryRepo.deleteCategory(id);
+  },
 };

@@ -17,7 +17,7 @@ export const categoryController = {
       data: categories,
     });
   },
-  getSingleCategory: async function (_req: Request, res: Response) {
+  getSingleCategory: async function (req: Request, res: Response) {
     if (!req.params.id) {
       throw new AppError(401, "Id is required");
     }
