@@ -59,3 +59,10 @@ providerRouter.delete(
   authorize("PROVIDER"),
   providerController.deleteMeal,
 );
+
+
+
+/**
+GET /provider/orders
+PATCH /provider/orders/:id/status
+ */

@@ -7,7 +7,7 @@ import { categorySchema, updateCategorySchema } from "./category.validation";
 
 export const categoryRouter = Router();
 
-categoryRouter.get("/", categoryController.getCategories);
+categoryRouter.get("/",categoryController.getCategories);
 categoryRouter.get(
   "/:id",
   validateRequest(idParamsSchema, "params"),

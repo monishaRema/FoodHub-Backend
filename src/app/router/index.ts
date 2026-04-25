@@ -1,3 +1,4 @@
+import { authorize } from './../middleware/authorize.middleware';
 import { authenticate } from './../middleware/authenticate.middleware';
 import { Request, Response, Router } from "express";
 import { sendResponse } from "../../shared/utils/sendResponse";
@@ -7,6 +8,7 @@ import { providerPublicRouter } from '../modules/providers/providersPublic.route
 import { mealsRouter } from '../modules/meal/meal.routes';
 import { categoryRouter } from '../modules/category/category.routes';
 import { orderRouter } from '../modules/order/order.routes';
+import { userRouter } from '../modules/user/users.routes';
 
 
 
@@ -26,5 +28,6 @@ router.use("/auth",authRouter)
 router.use("/meals", mealsRouter)
 router.use("/providers",providerPublicRouter)
 router.use("/provider",authenticate, providerRouter)
-router.use("/category",authenticate,categoryRouter)
+router.use("/admin/category",authenticate,categoryRouter)
+router.use("/admin/users",authenticate,authorize("ADMIN"),userRouter)
 router.use("/order",authenticate,orderRouter)
