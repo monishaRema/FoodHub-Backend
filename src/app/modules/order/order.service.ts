@@ -72,6 +72,15 @@ export const ordersService = {
 
     return order;
   },
-  getOrders: async function () {},
+  getOrders: async function (userId:string) {
+
+    const orders =   await ordersRepo.getOrders(userId)
+    if(orders.length == 0){
+        throw new AppError(401,"YOu didn't create any order yet")
+    }
+
+    return orders
+
+  },
   getSingleOrder: async function () {},
 };

@@ -54,6 +54,42 @@ export const ordersRepo = {
       return order;
     });
   },
-  getOrders: async function () {},
+  getOrders: async function (userId: string) {
+  return await prisma.order.findMany({
+    where: {
+      userId,
+    },
+    take:10,
+    skip:0,
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      status: true,
+      totalAmount: true,
+      deliveryAddress: true,
+      contactPhone: true,
+      createdAt: true,
+
+      provider: {
+        select: {
+          id: true,
+          shopName: true,
+        },
+      },
+
+      orderItems: {
+        select: {
+          id: true,
+          mealId: true,
+          mealNameSnapshot: true,
+          quantity: true,
+          price: true,
+        },
+      },
+    },
+  });
+},
   getSingleOrder: async function () {},
 };

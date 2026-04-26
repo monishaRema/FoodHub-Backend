@@ -17,6 +17,18 @@ export const ordersController = {
       data: order,
     });
   },
-  getOrders: async function (req: Request, res: Response) {},
+  getOrders: async function (req: Request, res: Response) {
+    if (!req.user) {
+      throw new AppError(403, "Forbidden: User id is required");
+    }
+    const orders = await ordersService.getOrders(req.user?.userId);
+
+    sendResponse({
+      res,
+      statusCode: 201,
+      message: "Order fetched successfully",
+      data: orders,
+    });
+  },
   getSingleOrder: async function (req: Request, res: Response) {},
 };
