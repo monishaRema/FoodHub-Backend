@@ -1,30 +1,39 @@
-
-
 import z from "zod";
 
 export const createOrderSchema = z.object({
-  providerId: z.uuid("Provider id must be a valid uuid"),
   deliveryAddress: z
     .string()
     .trim()
-    .min(1, "Delivery address is required"),
+    .min(5, "Delivery address is too short")
+    .max(255, "Delivery address is too long"),
 
   contactPhone: z
     .string()
     .trim()
-    .min(1, "Contact phone is required"),
+    .min(1,"Contact phone is required"),
 
   items: z
     .array(
       z.object({
-        mealId: z.uuid("Meal id must be a valid uuid"),
-        quantity: z.number().int().positive("Quantity must be greater than 0"),
+        mealId: z.string().pipe(z.uuid("Meal id must be a valid uuid")),
+        quantity: z
+          .number()
+          .int()
+          .positive("Quantity must be greater than 0")
       }),
     )
-    .min(1, "At least one item is required"),
+    .min(1, "At least one item is required")
+    .superRefine((items, ctx) => {
+      const ids = items.map((i) => i.mealId);
+      const uniqueIds = new Set(ids);
+
+      if (ids.length !== uniqueIds.size) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Duplicate meal items are not allowed",
+        });
+      }
+    }),
 });
 
-
-
-
-export type CreateOrderSchema = z.infer<typeof createOrderSchema>;
+export type CreateOrderType = z.infer<typeof createOrderSchema>;

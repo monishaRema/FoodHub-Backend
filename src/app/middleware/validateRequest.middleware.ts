@@ -19,10 +19,12 @@ export const validateRequest = (
     }
 
     res.locals[reqParts] = parsedRequest.data;
-    req[reqParts] = parsedRequest.data;
+
+    
+    if (reqParts !== "query") {
+      req[reqParts] = parsedRequest.data;
+    }
 
     next();
   };
 };
-
-
