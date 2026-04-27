@@ -9,13 +9,14 @@ import { mealsRouter } from '../modules/meal/meal.routes';
 import { categoryRouter } from '../modules/category/category.routes';
 import { orderRouter } from '../modules/order/order.routes';
 import { userRouter } from '../modules/user/users.routes';
+import { reviewRouter } from '../modules/review/review.routes';
 
 
 
 export const router = Router()
 
 
-router.get("/", (req:Request,res:Response) => {
+router.get("/", (_req:Request,res:Response) => {
 
    sendResponse({
     res,
@@ -31,3 +32,4 @@ router.use("/provider",authenticate, providerRouter)
 router.use("/admin/category",authenticate,categoryRouter)
 router.use("/admin/users",authenticate,authorize("ADMIN"),userRouter)
 router.use("/orders",authenticate,orderRouter)
+router.use("/reviews",authenticate,reviewRouter)
