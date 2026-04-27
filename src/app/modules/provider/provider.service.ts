@@ -247,7 +247,6 @@ export const providerService = {
       [OrderStatus.DELIVERED]: [],
       [OrderStatus.CANCELLED]: [],
     };
-
     const allowedNextStatuses = allowedTransitions[currentStatus];
 
     if (!allowedNextStatuses.includes(nextStatus)) {

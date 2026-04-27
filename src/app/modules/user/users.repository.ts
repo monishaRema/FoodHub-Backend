@@ -1,4 +1,48 @@
+
+import { Prisma } from "../../../../generated/prisma/client";
+import { UserStatus } from "../../../../generated/prisma/enums"
+import { prisma } from "../../../shared/lib/prisma"
+
+
+const safeUserSelect = {
+  id: true,
+  name: true,
+  email: true,
+  image: true,
+  phone: true,
+  role: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.UserSelect;
+
 export const userRepo = {
-    getUsers:async function(){},
-    updateUserStatus:async function(){},
+    getUsers:async function(take:number,skip:number){
+
+        return await prisma.user.findMany({
+            take:take,
+            skip:skip,
+            select:safeUserSelect
+        })
+    },
+
+    getUserById:async function(id:string){
+        return prisma.user.findUnique({
+            where:{
+                id
+            },
+             select:safeUserSelect
+        })
+    },
+    updateUserStatus:async function(id:string,status:UserStatus){
+
+        return await prisma.user.update({
+            data:{status},
+            where:{
+                id
+            },
+             select:safeUserSelect
+        })
+
+    },
 }

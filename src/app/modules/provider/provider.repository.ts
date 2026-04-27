@@ -5,7 +5,7 @@ import {
   ProviderCreateManyInput,
 } from "../../../../generated/prisma/models";
 import { prisma } from "../../../shared/lib/prisma";
-import { UpdateOrderStatusType } from "./provider.validation";
+
 
 export const providerRepo = {
   // Become Provider

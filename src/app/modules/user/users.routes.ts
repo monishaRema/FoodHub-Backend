@@ -16,9 +16,11 @@ userRouter.get(
   validateRequest(querySchema, "query"),
   userController.getUsers,
 );
+
 userRouter.get(
   "/:id/status",
   validateRequest(idParamsSchema, "params"),
   validateRequest(userStatusSchema, "body"),
   userController.updateUserStatus,
 );
+

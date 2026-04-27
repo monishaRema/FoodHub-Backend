@@ -74,8 +74,3 @@ providerRouter.get(
 );
 
 
-
-/**
-GET /provider/orders
-PATCH /provider/orders/:id/status
- */
