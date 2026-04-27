@@ -18,6 +18,19 @@ export const providerService = {
     data: RegisterProviderSchemaType,
     userId: string,
   ) {
+    const user = await providerRepo.getUserById(userId);
+
+    if (!user) {
+      throw new AppError(404, "User not found");
+    }
+
+    if (user.role !== "CUSTOMER") {
+      throw new AppError(
+        403,
+        "Only customers can create a provider profile",
+      );
+    }
+
     const existingProvider = await providerRepo.getProviderByUserId(userId);
 
     if (existingProvider) {

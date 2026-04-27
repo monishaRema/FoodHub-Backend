@@ -36,6 +36,18 @@ export const providerRepo = {
     });
   },
 
+  getUserById: async function (id: string) {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+  },
+
   // Create Meal
   createMeal: async function (data: MealCreateManyInput) {
     return await prisma.meal.create({

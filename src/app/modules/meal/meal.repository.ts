@@ -75,6 +75,13 @@ export const mealsRepo = {
         where:{
             mealId
         },
+        select: {
+            id: true,
+            rating: true,
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+        },
         take:take,
         skip:skip
     })

@@ -11,6 +11,7 @@ categoryRouter.get("/",categoryController.getCategories);
 categoryRouter.get(
   "/:id",
   validateRequest(idParamsSchema, "params"),
+  authorize("ADMIN"),
   categoryController.getSingleCategory,
 );
 categoryRouter.post(
