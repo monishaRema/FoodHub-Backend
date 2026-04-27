@@ -66,7 +66,7 @@ providerRouter.get(
   validateRequest(querySchema, "query"),
   providerController.getOrdersByProvider,
 );
-providerRouter.get(
+providerRouter.patch(
   "/orders/:id/status",
   validateRequest(idParamsSchema, "params"),
   validateRequest(updateOrderStatusSchema,"body"),

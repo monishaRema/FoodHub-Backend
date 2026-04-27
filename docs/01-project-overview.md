@@ -1,47 +1,95 @@
-# FoodHub — Multi-Role Meal Ordering Platform
+# FoodHub Backend Overview
 
-## Overview
+## Summary
 
-FoodHub is a full-stack meal ordering platform where customers can browse meals, place orders, and leave reviews, while providers manage their menus and fulfill orders. An admin panel allows system-wide control over users, categories, and orders.
+FoodHub Backend is an Express 5 and TypeScript API for a multi-role meal ordering platform. The API supports public catalog browsing, customer ordering, provider meal management, and admin moderation features.
 
-The system is designed as a role-based marketplace with three actors:
+The application is mounted under `/api` and uses cookie-based JWT authentication for protected routes.
 
-- Customer (buyer)
-- Provider (seller)
-- Admin (system controller)
+## Roles
 
-## Core Features
+- `CUSTOMER`: default registered user who can place orders and submit reviews
+- `PROVIDER`: a user who has created a provider profile and can manage their own meals and orders
+- `ADMIN`: a privileged user who can manage users and categories
 
-### Customer
-- Browse meals and providers
-- Filter meals by category, dietary type, and price
-- Add items to cart
-- Place orders (Cash on Delivery)
-- Track order status
-- Leave reviews after purchase
+## What the Current Codebase Supports
 
-### Provider
-- Manage menu (add/update/delete meals)
-- View incoming orders
-- Update order status
+### Public access
 
-### Admin
-- View and manage all users
-- Suspend or activate users
-- Manage categories
-- Monitor all orders
+- Health check
+- Register, login, logout, refresh token
+- Browse available meals
+- Read a single meal
+- Read reviews for a meal
+- Browse providers
+- Read a single provider
 
-## Key Business Rules
+### Authenticated customer capabilities
 
-- One order belongs to one provider
-- Meals are provider-owned (no shared catalog)
-- Only verified customers can review meals
-- Order status follows a strict lifecycle
-- Suspended users cannot perform protected actions
+- View current profile
+- Create an order from meals belonging to one provider
+- List own orders
+- Read a single own order
+- Cancel own order while status is `PENDING` or `CONFIRMED`
+- Create a review for a delivered order
 
-## Goals
+### Authenticated provider capabilities
 
-- Demonstrate clean backend architecture
-- Implement role-based access control (RBAC)
-- Model real-world order lifecycle
-- Build a recruiter-ready full-stack project
+- Create a provider profile
+- Create, list, read, update, and delete own meals
+- List own provider orders
+
+### Admin capabilities
+
+- List users
+- Update user status
+- List categories
+- Read a single category
+- Create, update, and delete categories
+
+## Important Business Rules Enforced in Code
+
+- One order can include meals from only one provider.
+- Only meals with `AVAILABLE` status can be ordered.
+- Duplicate meal items in a single order are rejected.
+- A user can create only one provider profile.
+- A provider can manage only their own meals and orders.
+- A category cannot be deleted while meals still reference it.
+- Reviews are allowed only for delivered orders and only for meals included in that order.
+- A user can review a given meal only once.
+
+## Response Conventions
+
+Successful responses use this shape:
+
+```json
+{
+  "success": true,
+  "message": "Human readable message",
+  "data": {}
+}
+```
+
+Error responses use this shape:
+
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "errorDetails": [
+    {
+      "field": "body.email",
+      "message": "Invalid email address"
+    }
+  ]
+}
+```
+
+## Notable Implementation Notes
+
+- The base path is `/api`, not `/api/v1`.
+- Authentication reads the `access-token` cookie, not an `Authorization` header.
+- `GET /api/admin/category` and `GET /api/admin/category/:id` require authentication but are not additionally restricted to `ADMIN` in the current router.
+- Two routes are wired unusually in the current code:
+  - `GET /api/admin/users/:id/status` updates a user's status and expects a request body.
+  - `GET /api/provider/orders/:id/status` is registered, but it currently calls the provider order listing controller instead of the order status update controller.

@@ -1,75 +1,100 @@
 # API Overview
 
 ## Base URL
-/api/v1
 
----
+`/api`
 
-## Auth
+## Authentication Model
 
-POST /auth/register  
-POST /auth/login  
-POST /auth/logout  
-GET /auth/me  
+- Protected routes require the `access-token` cookie.
+- Login sets both `access-token` and `refresh-token`.
+- Refresh token reads the `refresh-token` cookie and issues a fresh access token cookie.
+- The API does not currently use bearer-token headers in its auth middleware.
 
----
+## Route Groups
 
-## Public
+### System
 
-GET /meals  
-GET /meals/:id  
-GET /providers  
-GET /providers/:id  
+- `GET /`
 
----
+### Auth
 
-## Customer
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/logout`
+- `POST /auth/refresh-token`
+- `GET /auth/me`
 
-POST /orders  
-GET /orders  
-GET /orders/:id  
+### Public catalog
 
-POST /reviews  
+- `GET /meals`
+- `GET /meals/:id`
+- `GET /meals/:id/reviews`
+- `GET /providers`
+- `GET /providers/:id`
 
----
+### Provider area
 
-## Provider
+- `POST /provider/profile`
+- `GET /provider/meals`
+- `GET /provider/meals/:id`
+- `POST /provider/meals`
+- `PATCH /provider/meals/:id`
+- `DELETE /provider/meals/:id`
+- `GET /provider/orders`
+- `GET /provider/orders/:id/status`
 
-GET /provider/meals  
-POST /provider/meals  
-PATCH /provider/meals/:id  
-DELETE /provider/meals/:id  
+### Customer area
 
-GET /provider/orders  
-PATCH /provider/orders/:id/status  
+- `POST /orders`
+- `GET /orders`
+- `GET /orders/:id`
+- `PATCH /orders/:id/cancel`
+- `POST /reviews`
 
----
+### Admin area
 
-## Admin
+- `GET /admin/category`
+- `GET /admin/category/:id`
+- `POST /admin/category`
+- `PATCH /admin/category/:id`
+- `DELETE /admin/category/:id`
+- `GET /admin/users`
+- `GET /admin/users/:id/status`
 
-GET /admin/users  
-PATCH /admin/users/:id/status  
+## Validation Patterns
 
-GET /admin/orders  
+- Path ids are validated as UUIDs.
+- Pagination uses `page` and `limit`.
+- Validation errors return `400` with `errorDetails`.
 
-GET /admin/categories  
-POST /admin/categories  
-PATCH /admin/categories/:id  
-DELETE /admin/categories/:id  
+## Success Response Shape
 
----
+```json
+{
+  "success": true,
+  "message": "Fetched meals successfully",
+  "data": []
+}
+```
 
-## Authentication
+## Error Response Shape
 
-- JWT-based authentication
-- Token stored in httpOnly cookie
-- Middleware protects private routes
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errorDetails": [
+    {
+      "field": "email",
+      "message": "Invalid email address"
+    }
+  ]
+}
+```
 
----
+## Accuracy Notes
 
-## Authorization
-
-Role-based access control:
-- CUSTOMER
-- PROVIDER
-- ADMIN
+- The current code mounts category routes under `/admin/category`, not `/admin/categories`.
+- The current code exposes user-status change as `GET /admin/users/:id/status` with a request body.
+- The current code exposes provider order-status path `GET /provider/orders/:id/status`, but the route is not currently wired to the update controller.

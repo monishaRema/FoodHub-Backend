@@ -17,7 +17,7 @@ userRouter.get(
   userController.getUsers,
 );
 
-userRouter.get(
+userRouter.patch(
   "/:id/status",
   validateRequest(idParamsSchema, "params"),
   validateRequest(userStatusSchema, "body"),

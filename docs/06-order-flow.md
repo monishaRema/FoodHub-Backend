@@ -1,29 +1,63 @@
-# Order Lifecycle
+# Order Flow
 
-## Status Flow
+## Creation Rules
 
-PENDING → CONFIRMED → PREPARING → READY → DELIVERED  
-PENDING → CANCELLED  
+When a customer creates an order:
 
----
+1. Every submitted `mealId` must exist.
+2. Duplicate meal ids are rejected.
+3. Every meal must be `AVAILABLE`.
+4. All meals must belong to the same provider.
+5. `totalAmount` is calculated from database prices, not trusted from client input.
+6. Order items store meal name and price snapshots.
 
-## Role Permissions
+## Order Status Lifecycle
 
-### Customer
-- Create order
-- Cancel order (only PENDING)
+Primary lifecycle:
 
-### Provider
-- Confirm order
-- Update status through lifecycle
+`PENDING -> CONFIRMED -> PREPARING -> READY -> DELIVERED`
 
-### Admin
-- Override if needed
+Cancellation:
 
----
+- `PENDING -> CANCELLED`
+- `CONFIRMED -> CANCELLED`
 
-## Important Rules
+## Provider Status Transitions in Service Logic
 
-- No skipping states
-- No invalid transitions
-- Status must be validated in backend
+Allowed transitions:
+
+- `PENDING -> CONFIRMED`
+- `CONFIRMED -> PREPARING`
+- `PREPARING -> READY`
+- `READY -> DELIVERED`
+
+Disallowed:
+
+- skipping forward
+- moving backward
+- changing `DELIVERED`
+- changing `CANCELLED`
+
+## Customer Permissions
+
+- Create own orders
+- List own orders
+- Read own orders
+- Cancel own orders only while status is `PENDING` or `CONFIRMED`
+
+## Provider Permissions
+
+- View orders belonging to their own provider account
+- Progress order status only through the allowed transition map in service logic
+
+## Review Dependency
+
+A review can be created only if:
+
+- the order belongs to the current user
+- the order status is `DELIVERED`
+- the reviewed meal was included in the order
+
+## Current Route Wiring Note
+
+The provider service contains status-update rules, but the route registration for `/api/provider/orders/:id/status` is currently not connected to `updateOrderStatus`. This document describes both the intended service behavior and the current routing state.

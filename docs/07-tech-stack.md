@@ -1,42 +1,58 @@
 # Tech Stack
 
-## Backend
+## Runtime and Framework
 
 - Node.js
-- Express.js (v5)
-- TypeScript
+- Express `5.2.1`
+- TypeScript `6`
 
-## Database
+## Database Layer
 
 - PostgreSQL
-- Prisma ORM
+- Prisma `7.7.0`
+- `@prisma/adapter-pg`
+- generated Prisma client in `generated/prisma`
 
-## Authentication
+## Authentication and Security
 
-- JWT (jsonwebtoken)
-- bcrypt (password hashing)
-- Cookie-based auth (httpOnly)
+- `jsonwebtoken`
+- `bcryptjs`
+- `cookie-parser`
+- `helmet`
+- `cors`
+
+Implementation note:
+
+- `express-rate-limit` is installed but is not currently mounted in `src/app/app.ts`.
 
 ## Validation
 
-- Zod
+- `zod`
 
-## Security
+## Tooling
 
-- Helmet
-- CORS
-- Rate limiting
+- `tsx`
+- `pnpm`
+- `dotenv`
 
-## Development Tools
+## Architecture
 
-- tsx (runtime)
-- Prisma CLI
-- dotenv
+The project follows a modular layered backend structure:
 
----
+`route -> controller -> service -> repository`
 
-## Architecture Style
+Shared support layers:
 
-- Modular Monolith
-- Layered Architecture:
-  - Route → Controller → Service → Repository
+- `config`
+- `middleware`
+- `shared/lib`
+- `shared/utils`
+- `shared/validation`
+
+## Key Source Locations
+
+- app bootstrap: `src/app/app.ts`
+- server entry: `src/app/server.ts`
+- router mount: `src/app/router/index.ts`
+- schema: `prisma/schema.prisma`
+- migrations: `prisma/migrations`
