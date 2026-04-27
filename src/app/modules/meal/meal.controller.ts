@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { mealsService } from "./meal.service";
 import { sendResponse } from "../../../shared/utils/sendResponse";
 import { AppError } from "../../../shared/error/AppError";
+import { RequestParts } from "../../constants";
 
 export const mealsController = {
   getMeals: async function (req: Request, res: Response) {
@@ -29,4 +30,19 @@ export const mealsController = {
       data: meal,
     });
   },
+
+   getReviewsByMealId:async function(req:Request,res:Response){
+
+    if(!req.params.id){
+      throw new AppError(401, "Id is required");
+    }
+    const reviews = await mealsService.getReviewsByMealId(req.params.id as string,res.locals[RequestParts.query]);
+
+    sendResponse({
+      res,
+      statusCode: 200,
+      message: "Fetched reviews successfully",
+      data: reviews,
+    });
+   },
 };

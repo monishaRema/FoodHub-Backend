@@ -49,5 +49,5 @@ export const reviewService = {
       content: payload.content,
     });
   },
-  getReviews: async function () {},
+ 
 };

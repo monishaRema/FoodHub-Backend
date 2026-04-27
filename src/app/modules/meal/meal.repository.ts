@@ -68,4 +68,15 @@ export const mealsRepo = {
       },
     });
   },
+
+  getReviewsByMealId: async function (mealId:string,take:number,skip:number) {
+
+    return await prisma.review.findMany({
+        where:{
+            mealId
+        },
+        take:take,
+        skip:skip
+    })
+  },
 };

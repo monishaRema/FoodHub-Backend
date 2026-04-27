@@ -20,5 +20,5 @@ export const reviewController = {
         })
 
     },
-    getReview:async function(req:Request,res:Response){},
+   
 }

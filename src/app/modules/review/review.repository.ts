@@ -7,16 +7,7 @@ export const reviewRepo = {
       data,
     });
   },
-  getReviews: async function (mealId:string,take:number,skip:number) {
-
-    return await prisma.review.findMany({
-        where:{
-            mealId
-        },
-        take:take,
-        skip:skip
-    })
-  },
+  
 
   getOrderByOrderId:async function(id:string){
     return await prisma.order.findUnique({
