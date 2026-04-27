@@ -1,27 +1,23 @@
 # API Documentation
 
-## Base Path
+## 1. Introduction
 
-All routes in this project are mounted under:
+This document describes the current FoodHub Backend API implementation.
+
+Base path:
 
 `/api`
 
-## Authentication Details
+Authentication model:
 
-### Cookies
+- protected routes use the `access-token` cookie
+- refresh flow uses the `refresh-token` cookie
+- authentication failures return `401`
+- authorization failures return `403`
 
-- `access-token`: required by protected routes
-- `refresh-token`: used by `POST /api/auth/refresh-token`
+## 2. Standard Response Format
 
-### Protected-route behavior
-
-- Missing access token returns `401`
-- Invalid or expired access token returns `401`
-- Role checks return `403`
-
-## Response Formats
-
-### Success
+### 2.1 Success Response
 
 ```json
 {
@@ -31,7 +27,7 @@ All routes in this project are mounted under:
 }
 ```
 
-### Error
+### 2.2 Error Response
 
 ```json
 {
@@ -46,23 +42,45 @@ All routes in this project are mounted under:
 }
 ```
 
-## System
+## 3. Authentication Details
 
-### `GET /api/`
+Cookies used by the API:
 
-Health check.
+- `access-token`
+- `refresh-token`
 
-Response message:
+Notes:
 
-- `Server running healthy`
+- `access-token` is required for protected endpoints
+- `refresh-token` is required for token refresh
+- tokens are stored in `httpOnly` cookies
 
-## Auth Endpoints
+## 4. System Endpoint
 
-### `POST /api/auth/register`
+### 4.1 `GET /api/`
 
-Creates a new user.
+Purpose:
 
-Body:
+- Health check endpoint
+
+Success response:
+
+```json
+{
+  "success": true,
+  "message": "Server running healthy"
+}
+```
+
+## 5. Auth Endpoints
+
+### 5.1 `POST /api/auth/register`
+
+Purpose:
+
+- Register a new user
+
+Request body:
 
 ```json
 {
@@ -74,23 +92,25 @@ Body:
 }
 ```
 
-Validation:
+Validation rules:
 
-- `name`: required, max 100 chars
-- `email`: valid email
-- `password`: minimum 6 chars
-- `phone`: optional, 5 to 20 chars
+- `name`: required, max 100 characters
+- `email`: must be a valid email
+- `password`: minimum 6 characters
+- `phone`: optional, 5 to 20 characters
 - `image`: optional valid URL
 
 Success:
 
 - `201 Created`
 
-### `POST /api/auth/login`
+### 5.2 `POST /api/auth/login`
 
-Authenticates a user and sets auth cookies.
+Purpose:
 
-Body:
+- Authenticate a user and set login cookies
+
+Request body:
 
 ```json
 {
@@ -102,26 +122,29 @@ Body:
 Success:
 
 - `200 OK`
-- sets `access-token` cookie
-- sets `refresh-token` cookie
+- sets `access-token`
+- sets `refresh-token`
 
 Possible errors:
 
-- `401` if email is not found
-- `401` if password is invalid
-- `403` if account status is not `ACTIVE`
+- `401` invalid credentials
+- `403` inactive account
 
-### `POST /api/auth/logout`
+### 5.3 `POST /api/auth/logout`
 
-Clears auth cookies.
+Purpose:
+
+- Clear auth cookies
 
 Success:
 
 - `200 OK`
 
-### `POST /api/auth/refresh-token`
+### 5.4 `POST /api/auth/refresh-token`
 
-Reads `refresh-token` from cookies and issues a new access-token cookie.
+Purpose:
+
+- Issue a new access token from the refresh token cookie
 
 Success:
 
@@ -129,24 +152,30 @@ Success:
 
 Possible errors:
 
-- `401` if refresh token is missing
-- `401` if refresh token is invalid or expired
-- `404` if user no longer exists
-- `403` if user is not active
+- `401` refresh token missing
+- `401` refresh token invalid or expired
+- `404` user not found
+- `403` inactive account
 
-### `GET /api/auth/me`
+### 5.5 `GET /api/auth/me`
 
-Requires authentication.
+Purpose:
 
-Returns the authenticated user's safe profile data.
+- Return the authenticated user's safe profile data
 
-## Public Meal Endpoints
+Authentication:
 
-### `GET /api/meals`
+- required
 
-Returns paginated public meals.
+## 6. Public Meal Endpoints
 
-Query params:
+### 6.1 `GET /api/meals`
+
+Purpose:
+
+- Return paginated public meals
+
+Query parameters:
 
 - `search?: string`
 - `page?: number`, default `1`
@@ -157,36 +186,46 @@ Query params:
 Behavior:
 
 - only meals with `availability = AVAILABLE` are returned
-- `search` matches `name`, `excerpt`, `details`, and dietary enum values
+- search matches `name`, `excerpt`, `details`, and dietary enum text
 
-### `GET /api/meals/:id`
+### 6.2 `GET /api/meals/:id`
 
-Returns one meal by UUID.
+Purpose:
+
+- Return one meal by UUID
 
 Possible errors:
 
-- `404` if not found
+- `404` meal not found
 
-### `GET /api/meals/:id/reviews`
+### 6.3 `GET /api/meals/:id/reviews`
 
-Returns reviews for a meal.
+Purpose:
 
-Query params:
+- Return reviews for a specific meal
+
+Query parameters:
 
 - `page?: number`
 - `limit?: number`
 
+Response shape note:
+
+- public review listing returns a safe public subset of review fields
+
 Possible errors:
 
-- `404` if meal does not exist
+- `404` meal not found
 
-## Public Provider Endpoints
+## 7. Public Provider Endpoints
 
-### `GET /api/providers`
+### 7.1 `GET /api/providers`
 
-Returns paginated providers.
+Purpose:
 
-Query params:
+- Return paginated providers
+
+Query parameters:
 
 - `search?: string`
 - `page?: number`, default `1`
@@ -194,23 +233,28 @@ Query params:
 - `sortBy?: createdAt | updatedAt | shopName`, default `createdAt`
 - `sortOrder?: asc | desc`, default `desc`
 
-### `GET /api/providers/:id`
+### 7.2 `GET /api/providers/:id`
 
-Returns one provider record by UUID.
+Purpose:
 
-Note:
+- Return one provider by UUID
 
-- the current implementation returns provider fields only and does not include meals
+Implementation note:
 
-## Provider Endpoints
+- the current implementation returns provider fields only
+- it does not include the provider's meals
 
-All `/api/provider/*` routes require authentication because the router is mounted with `authenticate`.
+## 8. Provider Endpoints
 
-### `POST /api/provider/profile`
+All `/api/provider/*` routes require authentication.
 
-Creates a provider profile for the authenticated user.
+### 8.1 `POST /api/provider/profile`
 
-Body:
+Purpose:
+
+- Create a provider profile for the authenticated user
+
+Request body:
 
 ```json
 {
@@ -220,38 +264,56 @@ Body:
 }
 ```
 
-Behavior:
+Rules:
 
-- rejects if the user already has a provider profile
-- updates the linked user's role to `PROVIDER`
+- only a user with role `CUSTOMER` can create a provider profile
+- a user cannot create more than one provider profile
+- creating a provider profile promotes the user role to `PROVIDER`
 
-### `GET /api/provider/meals`
+### 8.2 `GET /api/provider/meals`
 
-Requires role `PROVIDER`.
+Purpose:
 
-Query params:
+- Return meals owned by the authenticated provider
+
+Authentication:
+
+- required
+- provider role required
+
+Query parameters:
 
 - `page?: number`, default `1`
 - `limit?: number`, default `10`, max `100`
 
-Returns only meals owned by the authenticated provider.
+### 8.3 `GET /api/provider/meals/:id`
 
-### `GET /api/provider/meals/:id`
+Purpose:
 
-Requires role `PROVIDER`.
+- Return one provider-owned meal
 
-Returns one provider-owned meal.
+Authentication:
+
+- required
+- provider role required
 
 Possible errors:
 
-- `404` if meal does not exist
-- `403` if meal belongs to a different provider
+- `404` meal not found
+- `403` meal belongs to another provider
 
-### `POST /api/provider/meals`
+### 8.4 `POST /api/provider/meals`
 
-Requires role `PROVIDER`.
+Purpose:
 
-Body:
+- Create a meal under the authenticated provider
+
+Authentication:
+
+- required
+- provider role required
+
+Request body:
 
 ```json
 {
@@ -267,18 +329,25 @@ Body:
 }
 ```
 
-Validation:
+Validation rules:
 
 - `price` must be positive
 - `dietary` must be `VEG`, `NON_VEG`, or `VEGAN`
 - `categoryId` must be a valid UUID
 - `availability` must be `AVAILABLE` or `UNAVAILABLE`
 
-### `PATCH /api/provider/meals/:id`
+### 8.5 `PATCH /api/provider/meals/:id`
 
-Requires role `PROVIDER`.
+Purpose:
 
-Accepts any subset of:
+- Update a provider-owned meal
+
+Authentication:
+
+- required
+- provider role required
+
+Allowed fields:
 
 - `name`
 - `image`
@@ -293,36 +362,51 @@ Accepts any subset of:
 Rules:
 
 - at least one field is required
-- category must exist if `categoryId` is supplied
-- provider can update only own meals
+- category must exist if `categoryId` is provided
+- provider can update only their own meals
 
-### `DELETE /api/provider/meals/:id`
+### 8.6 `DELETE /api/provider/meals/:id`
 
-Requires role `PROVIDER`.
+Purpose:
+
+- Delete a provider-owned meal
+
+Authentication:
+
+- required
+- provider role required
 
 Rules:
 
-- provider can delete only own meals
+- provider can delete only their own meals
 - deletion can fail with `409` if the meal is already referenced by orders
 
-### `GET /api/provider/orders`
+### 8.7 `GET /api/provider/orders`
 
-Returns paginated orders belonging to the authenticated provider.
+Purpose:
 
-Query params:
+- Return paginated orders for the authenticated provider
+
+Authentication:
+
+- required
+
+Query parameters:
 
 - `page?: number`, default `1`
 - `limit?: number`, default `10`, max `100`
 
-### `PATCH /api/provider/orders/:id/status`
+### 8.8 `PATCH /api/provider/orders/:id/status`
 
-Current router state:
+Purpose:
 
-- the route exists
-- UUID params and a body with `status` are validated
-- the route is currently wired to `getOrdersByProvider` instead of `updateOrderStatus`
+- Update the status of a provider-owned order
 
-Intended body shape from service validation:
+Authentication:
+
+- required
+
+Request body:
 
 ```json
 {
@@ -330,24 +414,38 @@ Intended body shape from service validation:
 }
 ```
 
-Allowed next statuses in service logic:
+Allowed request values:
 
 - `CONFIRMED`
 - `PREPARING`
 - `READY`
 - `DELIVERED`
 
-Actual update behavior should be treated as incomplete until the route/controller wiring is corrected in code.
+Allowed transition flow:
 
-## Order Endpoints
+- `PENDING -> CONFIRMED`
+- `CONFIRMED -> PREPARING`
+- `PREPARING -> READY`
+- `READY -> DELIVERED`
+
+Possible errors:
+
+- `404` provider not found
+- `404` order not found
+- `403` order belongs to another provider
+- `409` invalid status transition
+
+## 9. Order Endpoints
 
 All `/api/orders/*` routes require authentication.
 
-### `POST /api/orders`
+### 9.1 `POST /api/orders`
 
-Creates an order for the authenticated user.
+Purpose:
 
-Body:
+- Create an order for the authenticated user
+
+Request body:
 
 ```json
 {
@@ -365,56 +463,66 @@ Body:
 Rules:
 
 - at least one item is required
-- meal ids must be unique inside the payload
+- meal ids must be unique within the payload
 - quantity must be a positive integer
 - all meals must exist
 - all meals must be available
 - all meals must belong to the same provider
 
-### `GET /api/orders`
+### 9.2 `GET /api/orders`
 
-Returns paginated orders for the authenticated user.
+Purpose:
 
-Query params:
+- Return paginated orders for the authenticated user
+
+Query parameters:
 
 - `page?: number`
 - `limit?: number`
 
+Current implementation note:
+
+- if the user has no orders, the service currently returns `401`
+
+### 9.3 `GET /api/orders/:id`
+
+Purpose:
+
+- Return one order belonging to the authenticated user
+
 Possible errors:
 
-- `401` if the user has not created any orders yet
+- `404` order not found
+- `403` order belongs to another user
 
-### `GET /api/orders/:id`
+### 9.4 `PATCH /api/orders/:id/cancel`
 
-Returns one order belonging to the authenticated user.
+Purpose:
 
-Possible errors:
+- Cancel an order belonging to the authenticated user
 
-- `404` if not found
-- `403` if the order belongs to a different user
-
-### `PATCH /api/orders/:id/cancel`
-
-Cancels an order belonging to the authenticated user.
-
-Allowed only when current status is:
+Allowed current statuses:
 
 - `PENDING`
 - `CONFIRMED`
 
 Possible errors:
 
-- `409` if the order is no longer cancellable
+- `404` order not found
+- `403` order belongs to another user
+- `409` order is no longer cancellable
 
-## Review Endpoint
+## 10. Review Endpoint
 
 All `/api/reviews/*` routes require authentication.
 
-### `POST /api/reviews`
+### 10.1 `POST /api/reviews`
 
-Creates a review tied to a delivered order.
+Purpose:
 
-Body:
+- Create a review tied to a delivered order
+
+Request body:
 
 ```json
 {
@@ -427,39 +535,50 @@ Body:
 
 Rules:
 
-- rating must be an integer from `1` to `5`
-- content must be 3 to 500 chars
+- `rating` must be an integer from `1` to `5`
+- `content` must be between 3 and 500 characters
 - order must exist
 - order must belong to the current user
 - order must be `DELIVERED`
 - meal must be part of that order
 - duplicate review for the same user and meal is rejected
 
-## Admin Category Endpoints
+## 11. Admin Category Endpoints
 
-All `/api/admin/category/*` routes require authentication because the route group is mounted under `authenticate`.
+All `/api/admin/category/*` routes require authentication.
 
-### `GET /api/admin/category`
+### 11.1 `GET /api/admin/category`
 
-Returns all categories ordered by `createdAt desc`.
+Purpose:
 
-Current access behavior:
-
-- any authenticated user can access this route
-
-### `GET /api/admin/category/:id`
-
-Returns one category by UUID.
+- Return all categories ordered by `createdAt desc`
 
 Current access behavior:
 
 - any authenticated user can access this route
 
-### `POST /api/admin/category`
+### 11.2 `GET /api/admin/category/:id`
 
-Requires role `ADMIN`.
+Purpose:
 
-Body:
+- Return one category by UUID
+
+Current access behavior:
+
+- any authenticated user can access this route
+
+### 11.3 `POST /api/admin/category`
+
+Purpose:
+
+- Create a category
+
+Authentication:
+
+- required
+- admin role required
+
+Request body:
 
 ```json
 {
@@ -467,11 +586,18 @@ Body:
 }
 ```
 
-### `PATCH /api/admin/category/:id`
+### 11.4 `PATCH /api/admin/category/:id`
 
-Requires role `ADMIN`.
+Purpose:
 
-Body:
+- Update a category
+
+Authentication:
+
+- required
+- admin role required
+
+Request body:
 
 ```json
 {
@@ -484,38 +610,44 @@ Rules:
 - category must exist
 - category name must remain unique
 
-### `DELETE /api/admin/category/:id`
+### 11.5 `DELETE /api/admin/category/:id`
 
-Requires role `ADMIN`.
+Purpose:
+
+- Delete a category
+
+Authentication:
+
+- required
+- admin role required
 
 Rules:
 
 - category must exist
-- category cannot be deleted while meals still use it
+- category cannot be deleted while meals still reference it
 
-## Admin User Endpoints
+## 12. Admin User Endpoints
 
-All `/api/admin/users/*` routes require authentication and role `ADMIN` because the router is mounted with both `authenticate` and `authorize("ADMIN")`.
+All `/api/admin/users/*` routes require authentication and role `ADMIN`.
 
-### `GET /api/admin/users`
+### 12.1 `GET /api/admin/users`
 
-Returns paginated users.
+Purpose:
 
-Query params:
+- Return paginated users
+
+Query parameters:
 
 - `page?: number`
 - `limit?: number`
 
-### `PATCH /api/admin/users/:id/status`
+### 12.2 `PATCH /api/admin/users/:id/status`
 
-Current router behavior:
+Purpose:
 
-- this route uses `GET`
-- it validates `params.id`
-- it also validates a request body
-- it performs a user status update
+- Update a user's status
 
-Body:
+Request body:
 
 ```json
 {
@@ -530,5 +662,5 @@ Allowed values:
 
 Possible errors:
 
-- `404` if user does not exist
-- `409` if user already has the requested status
+- `404` user not found
+- `409` user already has the requested status
