@@ -1,120 +1,124 @@
 # FoodHub Backend
 
-FoodHub Backend is a TypeScript and Express API for a multi-role meal ordering platform. It supports customers placing orders, providers managing menus and fulfillment, and admins overseeing users, categories, and orders.
+FoodHub Backend is a TypeScript and Express API for a multi-role meal ordering platform. It supports public meal browsing, customer ordering, provider meal management, and admin moderation features on top of a PostgreSQL database with Prisma.
 
 ## Overview
 
-The backend is designed as a role-based marketplace with three core actors:
+The backend is organized around three roles:
 
-- Customer
-- Provider
-- Admin
+- `CUSTOMER`
+- `PROVIDER`
+- `ADMIN`
 
-Key business rules:
+Core business rules enforced by the project:
 
-- One order belongs to one provider
-- Meals are provider-owned
-- Only verified customers can review meals
-- Order status follows a strict lifecycle
-- Suspended users cannot perform protected actions
+- one order belongs to one provider
+- meals are provider-owned
+- only delivered orders can be reviewed
+- one user can review a meal only once
+- order status follows a strict lifecycle
 
-## Core Features
+## Current Capabilities
+
+### Public
+
+- health check
+- register and login
+- browse meals
+- view a single meal
+- view reviews for a meal
+- browse providers
+- view a single provider
 
 ### Customer
 
-- Browse meals and providers
-- Filter meals by category, dietary type, and price
-- Place orders with Cash on Delivery
-- Track order status
-- Leave reviews after purchase
+- get current profile
+- create orders
+- list own orders
+- read own order details
+- cancel eligible orders
+- create reviews after delivery
 
 ### Provider
 
-- Manage menu items
-- View incoming orders
-- Update order status through the order lifecycle
+- create provider profile
+- create, list, read, update, and delete own meals
+- list provider orders
+- update provider order status
 
 ### Admin
 
-- Manage users
-- Suspend or activate accounts
-- Manage categories
-- Monitor platform orders
-
-## Domain Structure
-
-The backend is organized around these responsibility areas:
-
-- Identity & Access
-- Catalog
-- Cart & Checkout
-- Orders
-- Reviews
-- Admin Governance
-
-## Data Model
-
-Main entities in the system:
-
-- `User`
-- `Provider`
-- `Category`
-- `Meal`
-- `Order`
-- `OrderItem`
-- `Review`
-
-Relationship highlights:
-
-- A `User` may have one `Provider` profile
-- A `Provider` owns many `Meal` records
-- An `Order` belongs to one customer and one provider
-- An `Order` contains many `OrderItem` records
-- A `Review` links a user, meal, and order
-
-For the ERD and full model notes, see the docs section below.
-
-## Order Lifecycle
-
-The order flow is enforced in the backend:
-
-`PENDING -> CONFIRMED -> PREPARING -> READY -> DELIVERED`
-
-Cancellation rule:
-
-`PENDING -> CANCELLED`
-
-Lifecycle constraints:
-
-- No skipped states
-- No invalid transitions
-- Customer can cancel only while order is `PENDING`
-- Provider advances the order through valid states
-- Admin can override when necessary
+- list users
+- update user status
+- list categories
+- read one category
+- create, update, and delete categories
 
 ## API Overview
 
 Base path:
 
-`/api/v1`
+`/api`
 
 Main route groups:
 
-- Auth: `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/me`
-- Public: `/meals`, `/meals/:id`, `/providers`, `/providers/:id`
-- Customer: `/orders`, `/orders/:id`, `/reviews`
-- Provider: `/provider/meals`, `/provider/orders`, `/provider/orders/:id/status`
-- Admin: `/admin/users`, `/admin/orders`, `/admin/categories`
+- auth: `/auth/*`
+- public meals: `/meals/*`
+- public providers: `/providers/*`
+- provider area: `/provider/*`
+- customer orders: `/orders/*`
+- reviews: `/reviews/*`
+- admin categories: `/admin/category/*`
+- admin users: `/admin/users/*`
 
 Authentication and authorization:
 
 - JWT-based authentication
-- Token stored in an `httpOnly` cookie
-- Role-based access control for `CUSTOMER`, `PROVIDER`, and `ADMIN`
+- tokens are stored in `httpOnly` cookies
+- protected routes use the `access-token` cookie
+- role checks are enforced with middleware
+
+## Order Lifecycle
+
+Provider progression:
+
+`PENDING -> CONFIRMED -> PREPARING -> READY -> DELIVERED`
+
+Customer cancellation:
+
+- `PENDING -> CANCELLED`
+- `CONFIRMED -> CANCELLED`
+
+## Response Shape
+
+Successful responses use this shape:
+
+```json
+{
+  "success": true,
+  "message": "Operation completed",
+  "data": {}
+}
+```
+
+Validation and application errors use this shape:
+
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errorDetails": [
+    {
+      "field": "email",
+      "message": "Invalid email address"
+    }
+  ]
+}
+```
 
 ## Tech Stack
 
-### Backend
+### Runtime and Framework
 
 - Node.js
 - Express 5
@@ -124,27 +128,28 @@ Authentication and authorization:
 
 - PostgreSQL
 - Prisma ORM
+- `@prisma/adapter-pg`
 
 ### Auth, Validation, and Security
 
 - `jsonwebtoken`
-- `bcrypt` / `bcryptjs`
+- `bcryptjs`
 - `zod`
 - `helmet`
 - `cors`
+- `cookie-parser`
 - `express-rate-limit`
 
-### Development Tooling
+### Tooling
 
 - `tsx`
-- Prisma CLI
 - `dotenv`
 - `pnpm`
 
 Architecture style:
 
-- Modular monolith
-- Layered flow: Route -> Controller -> Service -> Repository
+- modular monolith
+- layered flow: `route -> controller -> service -> repository`
 
 ## Getting Started
 
@@ -162,7 +167,17 @@ pnpm install
 
 ### Configure environment
 
-Create and update your environment variables in `.env` before running the server and database commands.
+Set these values in `.env` before starting the app:
+
+- `DATABASE_URL`
+- `PORT`
+- `NODE_ENV`
+- `JWT_ACCESS_TOKEN_SECRET`
+- `JWT_REFRESH_TOKEN_SECRET`
+- `JWT_ACCESS_TOKEN_EXPIRED_IN`
+- `JWT_REFRESH_TOKEN_EXPIRED_IN`
+- `BCRYPT_SALT_ROUNDS`
+- `FRONTEND_URL`
 
 ### Prisma workflow
 
@@ -201,16 +216,17 @@ pnpm p:studio
 
 ## Available Scripts
 
-- `pnpm dev` - Run the development server with `tsx watch`
-- `pnpm type-check` - Run TypeScript without emitting files
-- `pnpm build` - Build the project into `dist`
-- `pnpm start` - Start the built server
-- `pnpm p:format` - Format the Prisma schema
-- `pnpm p:validate` - Validate the Prisma schema
-- `pnpm p:gen` - Generate Prisma client
-- `pnpm p:migrate` - Run Prisma development migrations
-- `pnpm p:deploy` - Deploy Prisma migrations
-- `pnpm p:studio` - Open Prisma Studio
+- `pnpm dev` - run the development server with `tsx watch`
+- `pnpm type-check` - run TypeScript without emitting files
+- `pnpm build` - build the project into `dist`
+- `pnpm start` - start the built server
+- `pnpm p:format` - format the Prisma schema
+- `pnpm p:validate` - validate the Prisma schema
+- `pnpm p:gen` - generate Prisma client
+- `pnpm p:migrate` - run Prisma development migrations
+- `pnpm p:reset` - reset the database with Prisma migrations
+- `pnpm p:deploy` - deploy Prisma migrations
+- `pnpm p:studio` - open Prisma Studio
 
 ## Project Docs
 
@@ -224,7 +240,15 @@ Detailed project documentation lives in [docs](./docs):
 - [06-order-flow.md](./docs/06-order-flow.md)
 - [07-tech-stack.md](./docs/07-tech-stack.md)
 - [08-project-requirements.md](./docs/08-project-requirements.md)
+- [09-api-documentation.md](./docs/09-api-documentation.md)
+
+## Suggested Reading Order
+
+1. [Project Overview](./docs/01-project-overview.md)
+2. [Data Model](./docs/03-data-model.md)
+3. [API Overview](./docs/05-api-overview.md)
+4. [API Documentation](./docs/09-api-documention.md)
 
 ## Goal
 
-This project is aimed at demonstrating clean backend architecture, practical RBAC, real-world order lifecycle modeling, and a recruiter-ready full-stack backend foundation.
+This project is intended to demonstrate practical RBAC, real-world order lifecycle handling, modular backend structure, and a solid full-stack-ready API foundation.
