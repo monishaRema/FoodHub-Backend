@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/app/server.ts",
     "type-check": "tsc --noEmit",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "prisma generate && tsc -p tsconfig.build.json",
     "start": "node dist/app/server.js",
+    "postinstall": "prisma generate",
     "p:format": "prisma format",
     "p:validate": "prisma validate",
     "p:gen": "prisma generate",
