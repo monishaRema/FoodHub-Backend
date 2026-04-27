@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { userController } from "./users.controller";
 import { validateRequest } from "../../middleware/validateRequest.middleware";
-import { userQuerySchema, userStatusSchema } from "./users.validation";
-import { idParamsSchema } from "../../../shared/validation";
+import {  userStatusSchema } from "./users.validation";
+import { idParamsSchema, querySchema } from "../../../shared/validation";
 
 export const userRouter = Router();
 
@@ -13,7 +13,7 @@ PATCH /admin/users/:id/status
 
 userRouter.get(
   "/",
-  validateRequest(userQuerySchema, "query"),
+  validateRequest(querySchema, "query"),
   userController.getUsers,
 );
 userRouter.get(

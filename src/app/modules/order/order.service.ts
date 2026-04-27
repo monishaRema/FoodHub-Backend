@@ -1,8 +1,17 @@
 import { Prisma } from "../../../../generated/prisma/client";
-import { MealAvailability } from "../../../../generated/prisma/enums";
+import {
+  MealAvailability,
+  OrderStatus,
+} from "../../../../generated/prisma/enums";
 import { AppError } from "../../../shared/error/AppError";
+import { QueryType } from "../../../shared/validation";
 import { ordersRepo } from "./order.repository";
 import { CreateOrderType } from "./order.validation";
+
+const cancellableStatuses: OrderStatus[] = [
+  OrderStatus.PENDING,
+  OrderStatus.CONFIRMED,
+];
 
 export const ordersService = {
   createOrder: async function (payload: CreateOrderType, userId: string) {
@@ -72,15 +81,50 @@ export const ordersService = {
 
     return order;
   },
-  getOrders: async function (userId:string) {
+  getOrders: async function (userId: string, query: QueryType) {
+    const limit = query.limit || 10;
+    const page = query.page || 1;
+    const skip = (page - 1) * limit;
 
-    const orders =   await ordersRepo.getOrders(userId)
-    if(orders.length == 0){
-        throw new AppError(401,"YOu didn't create any order yet")
+    const orders = await ordersRepo.getOrders(userId, limit, skip);
+    if (orders.length == 0) {
+      throw new AppError(401, "YOu didn't create any order yet");
     }
 
-    return orders
-
+    return orders;
   },
-  getSingleOrder: async function () {},
+  getSingleOrder: async function (id: string, userId: string) {
+    const order = await ordersRepo.getSingleOrder(id);
+
+    if (!order) {
+      throw new AppError(404, "No order found");
+    }
+
+    if (order.userId !== userId) {
+      throw new AppError(403, "Forbidden: You can view only your own order");
+    }
+
+    return order;
+  },
+  cancelOrder: async function (id: string, userId: string) {
+    const order = await ordersRepo.getSingleOrder(id);
+    if (!order) {
+      throw new AppError(404, "No order found");
+    }
+
+    if (order.userId !== userId) {
+      throw new AppError(403, "Forbidden: You can cancel only your own order");
+    }
+
+    if (!cancellableStatuses.includes(order.status)) {
+      throw new AppError(
+        409,
+        `Order cannot be cancelled after it is ${order.status}`,
+      );
+    }
+
+    const cancelledOrder = await ordersRepo.cancelOrder(id);
+
+    return cancelledOrder;
+  },
 };

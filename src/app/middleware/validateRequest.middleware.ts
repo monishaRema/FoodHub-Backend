@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import z from "zod";
 import { AppError } from "../../shared/error/AppError";
+import { ReqPartsValue, RequestParts } from "../constants";
 
 export const validateRequest = (
   schema: z.ZodTypeAny,
-  reqParts: "body" | "params" | "query",
+  reqParts: ReqPartsValue,
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const parsedRequest = schema.safeParse(req[reqParts]);
@@ -21,7 +22,7 @@ export const validateRequest = (
     res.locals[reqParts] = parsedRequest.data;
 
     
-    if (reqParts !== "query") {
+    if (reqParts !== RequestParts.query) {
       req[reqParts] = parsedRequest.data;
     }
 

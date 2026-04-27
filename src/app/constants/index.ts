@@ -16,4 +16,13 @@ export const UserRole = {
 export type UserRoleKey = keyof typeof UserRole;
 export type UserRoleValue = (typeof UserRole)[keyof typeof UserRole];
 
+export const RequestParts = {
+  body:"body",
+  query:"query",
+  params:"params"
+} as const 
+
+export type ReqPartsKey = keyof typeof RequestParts;
+export type ReqPartsValue = (typeof RequestParts)[keyof typeof RequestParts];
+
 
