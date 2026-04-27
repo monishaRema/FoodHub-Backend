@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AppError } from "../../../shared/error/AppError";
 import { providerService } from "./provider.service";
 import { sendResponse } from "../../../shared/utils/sendResponse";
+import { RequestParts } from "../../constants";
 
 export const providerController = {
   // Become Provider
@@ -13,7 +14,6 @@ export const providerController = {
     const provider = await providerService.registerProvider(
       req.body,
       req.user.userId,
-      
     );
 
     sendResponse({
@@ -45,7 +45,10 @@ export const providerController = {
       throw new AppError(403, "Forbidden: You are not authorized");
     }
 
-    const meals = await providerService.getMeals(req.user.userId,res.locals.query);
+    const meals = await providerService.getMeals(
+      req.user.userId,
+      res.locals.query,
+    );
     sendResponse({
       res,
       statusCode: 200,
@@ -121,4 +124,45 @@ export const providerController = {
       data: deletedMeal,
     });
   },
+
+  getOrdersByProvider: async function (req: Request, res: Response) {
+    if (!req.user) {
+      throw new AppError(403, "Forbidden: You are not authorized");
+    }
+
+    const orders = await providerService.getOrdersByProvider(
+      req.user.userId,
+      res.locals[RequestParts.query],
+    );
+    sendResponse({
+      res,
+      statusCode: 200,
+      message: "Fetched orders successfully",
+      data: orders,
+    });
+  },
+
+  updateOrderStatus:async function(req: Request, res: Response){
+      if (!req.user) {
+      throw new AppError(403, "Forbidden: You are not authorized");
+    }
+
+    if (!req.params.id) {
+      throw new AppError(400, "Params is required");
+    }
+
+    const updateOrder = await providerService.updateOrderStatus(
+       req.user.userId,
+       req.params.id as string,
+       req.body
+    );
+
+     sendResponse({
+      res,
+      statusCode: 200,
+      message: "Order updated successfully",
+      data: updateOrder,
+    });
+
+  }
 };

@@ -1,13 +1,15 @@
-import { Prisma } from "../../../../generated/prisma/client";
+import { OrderStatus, Prisma } from "../../../../generated/prisma/client";
 import { MealUncheckedUpdateInput } from "../../../../generated/prisma/models";
 
 import { AppError } from "../../../shared/error/AppError";
+import { QueryType } from "../../../shared/validation";
 import { providerRepo } from "./provider.repository";
 import {
   CreteMealSchemaType,
   ProviderMealQueryType,
   RegisterProviderSchemaType,
   UpdateMealSchemaType,
+  UpdateOrderStatusType,
 } from "./provider.validation";
 
 export const providerService = {
@@ -192,5 +194,69 @@ export const providerService = {
 
       throw error;
     }
+  },
+
+  getOrdersByProvider: async function (userId: string, query: QueryType) {
+    const limit = query.limit || 10;
+    const page = query.page || 1;
+    const skip = (page - 1) * limit;
+
+    const provider = await providerRepo.getProviderByUserId(userId);
+    if (!provider) {
+      throw new AppError(404, "Provider not found");
+    }
+
+    const orders = await providerRepo.getOrdersByProvider(
+      provider.id,
+      limit,
+      skip,
+    );
+
+    return orders;
+  },
+  updateOrderStatus: async function (
+    userId: string,
+    orderId: string,
+    payload: UpdateOrderStatusType,
+  ) {
+    const provider = await providerRepo.getProviderByUserId(userId);
+    if (!provider) {
+      throw new AppError(404, "Provider not found");
+    }
+
+    const order = await providerRepo.getOrderById(orderId);
+
+    if (!order) {
+      throw new AppError(404, "Order not found");
+    }
+
+    if (order.providerId !== provider.id) {
+      throw new AppError(403, "Forbidden: You can update only your own order");
+    }
+
+    const currentStatus = order.status;
+    const nextStatus = payload.status;
+
+
+
+    const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
+      [OrderStatus.PENDING]: [OrderStatus.CONFIRMED],
+      [OrderStatus.CONFIRMED]: [OrderStatus.PREPARING],
+      [OrderStatus.PREPARING]: [OrderStatus.READY],
+      [OrderStatus.READY]: [OrderStatus.DELIVERED],
+      [OrderStatus.DELIVERED]: [],
+      [OrderStatus.CANCELLED]: [],
+    };
+
+    const allowedNextStatuses = allowedTransitions[currentStatus];
+
+    if (!allowedNextStatuses.includes(nextStatus)) {
+      throw new AppError(
+        409,
+        `Invalid status transition from ${currentStatus} to ${nextStatus}`,
+      );
+    }
+
+    return await providerRepo.updateOrderStatus(orderId, nextStatus);
   },
 };

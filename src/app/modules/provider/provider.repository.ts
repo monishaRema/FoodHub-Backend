@@ -1,9 +1,11 @@
+import { OrderStatus } from "../../../../generated/prisma/enums";
 import {
   MealCreateManyInput,
   MealUncheckedUpdateInput,
   ProviderCreateManyInput,
 } from "../../../../generated/prisma/models";
 import { prisma } from "../../../shared/lib/prisma";
+import { UpdateOrderStatusType } from "./provider.validation";
 
 export const providerRepo = {
   // Become Provider
@@ -90,4 +92,84 @@ export const providerRepo = {
       },
     });
   },
+
+
+  getOrdersByProvider:async function(providerId:string,take:number,skip:number){
+
+    return await prisma.order.findMany({
+      where:{
+        providerId
+      },
+      take:take,
+      skip:skip,
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+        totalAmount: true,
+        deliveryAddress: true,
+        contactPhone: true,
+        createdAt: true,
+
+        provider: {
+          select: {
+            id: true,
+            shopName: true,
+          },
+        },
+
+        orderItems: {
+          select: {
+            id: true,
+            mealId: true,
+            mealNameSnapshot: true,
+            quantity: true,
+            price: true,
+          },
+        },
+      }
+    })
+
+  },
+  getOrderById:async function(orderId:string){
+      return await prisma.order.findUnique({
+      where:{
+        id:orderId
+      },
+      
+      select: {
+        id: true,
+        userId: true,
+        providerId:true,
+        status: true,
+        totalAmount: true,
+        deliveryAddress: true,
+        contactPhone: true,
+        createdAt: true,
+
+        orderItems: {
+          select: {
+            id: true,
+            mealId: true,
+            mealNameSnapshot: true,
+            quantity: true,
+            price: true,
+          },
+        },
+      }
+    })
+
+  },
+  updateOrderStatus:async function(id:string,status:OrderStatus){
+
+    return  await prisma.order.update({
+      data:{
+        status
+      },
+      where:{
+        id
+      }
+    })
+  }
+
 };

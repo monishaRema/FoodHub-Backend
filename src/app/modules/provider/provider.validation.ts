@@ -1,6 +1,7 @@
 import {
   DietaryType,
   MealAvailability,
+  OrderStatus,
 } from "../../../../generated/prisma/enums";
 import z from "zod";
 
@@ -86,3 +87,24 @@ export const providerMealQuerySchema = z.object({
 
 
 export type ProviderMealQueryType = z.infer<typeof providerMealQuerySchema>
+
+
+
+export const updateOrderStatusSchema = z.object({
+  status: z
+    .string()
+    .trim()
+    .transform((val) => val.toUpperCase())
+    .pipe(
+      z.enum([
+        OrderStatus.CONFIRMED,
+        OrderStatus.PREPARING,
+        OrderStatus.READY,
+        OrderStatus.DELIVERED,
+      ], {
+        error: "Invalid order status",
+      })
+    ),
+});
+
+export type UpdateOrderStatusType = z.infer<typeof updateOrderStatusSchema>

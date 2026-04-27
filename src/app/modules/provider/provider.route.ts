@@ -6,9 +6,10 @@ import {
   providerMealQuerySchema,
   registerProviderSchema,
   updateMealSchema,
+  updateOrderStatusSchema,
 } from "./provider.validation";
 import { authorize } from "../../middleware/authorize.middleware";
-import { idParamsSchema } from "../../../shared/validation";
+import { idParamsSchema, querySchema } from "../../../shared/validation";
 
 export const providerRouter = Router();
 
@@ -23,7 +24,7 @@ providerRouter.post(
 providerRouter.get(
   "/meals",
   authorize("PROVIDER"),
-  validateRequest(providerMealQuerySchema,"query"),
+  validateRequest(providerMealQuerySchema, "query"),
   providerController.getMeals,
 );
 
@@ -58,6 +59,18 @@ providerRouter.delete(
   validateRequest(idParamsSchema, "params"),
   authorize("PROVIDER"),
   providerController.deleteMeal,
+);
+
+providerRouter.get(
+  "/orders",
+  validateRequest(querySchema, "query"),
+  providerController.getOrdersByProvider,
+);
+providerRouter.get(
+  "/orders/:id/status",
+  validateRequest(idParamsSchema, "params"),
+  validateRequest(updateOrderStatusSchema,"body"),
+  providerController.getOrdersByProvider,
 );
 
 
