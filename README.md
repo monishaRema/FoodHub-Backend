@@ -247,7 +247,7 @@ Detailed project documentation lives in [docs](./docs):
 1. [Project Overview](./docs/01-project-overview.md)
 2. [Data Model](./docs/03-data-model.md)
 3. [API Overview](./docs/05-api-overview.md)
-4. [API Documentation](./docs/09-api-documention.md)
+4. [API Documentation](./docs/09-api-documentation.md)
 
 ## Goal
 
