@@ -17,7 +17,7 @@
     "p:deploy": "prisma migrate deploy",
     "p:studio": "prisma studio"
   },
-  "types": "module",
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
