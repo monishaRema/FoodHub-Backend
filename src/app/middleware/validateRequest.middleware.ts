@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import z from "zod";
-import { AppError } from "../../shared/error/AppError";
-import { ReqPartsValue, RequestParts } from "../constants";
+import { AppError } from "../../shared/error/AppError.js";
+import { ReqPartsValue, RequestParts } from "../constants/index.js";
 
 export const validateRequest = (
   schema: z.ZodTypeAny,

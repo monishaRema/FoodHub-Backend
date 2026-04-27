@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "../../shared/error/AppError";
+import { AppError } from "../../shared/error/AppError.js";
 
 export const notFound = (req: Request, _res: Response, next: NextFunction) => {
   return next(

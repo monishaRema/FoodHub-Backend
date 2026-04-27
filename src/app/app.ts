@@ -3,10 +3,10 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
-import { router } from "./router";
-import { globalErrorHandler } from "./middleware/globalErrorHandler.middleware";
-import { notFound } from "./middleware/notFound.middleware";
-import { config } from "./config/env";
+import { router } from "./router/index.js";
+import { globalErrorHandler } from "./middleware/globalErrorHandler.middleware.js";
+import { notFound } from "./middleware/notFound.middleware.js";
+import { config } from "./config/env.js";
 
 export const app = express()
 

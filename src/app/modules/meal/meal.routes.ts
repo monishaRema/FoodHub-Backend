@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { mealsController } from "./meal.controller";
-import { validateRequest } from "../../middleware/validateRequest.middleware";
-import { idParamsSchema, querySchema } from "../../../shared/validation";
-import { mealQuerySchema } from "./meal.validation";
+import { mealsController } from "./meal.controller.js";
+import { validateRequest } from "../../middleware/validateRequest.middleware.js";
+import { idParamsSchema, querySchema } from "../../../shared/validation/index.js";
+import { mealQuerySchema } from "./meal.validation.js";
 
 export const mealsRouter= Router();
 

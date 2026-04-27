@@ -1,7 +1,7 @@
-import { sendResponse } from './../../../shared/utils/sendResponse';
+import { sendResponse } from './../../../shared/utils/sendResponse.js';
 import { Request, Response } from "express";
-import { reviewService } from "./review.service";
-import { AppError } from '../../../shared/error/AppError';
+import { reviewService } from "./review.service.js";
+import { AppError } from '../../../shared/error/AppError.js';
 
 export const reviewController = {
     createReview:async function(req:Request,res:Response){

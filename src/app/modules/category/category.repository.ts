@@ -1,4 +1,4 @@
-import { prisma } from "../../../shared/lib/prisma";
+import { prisma } from "../../../shared/lib/prisma.js";
 
 export const categoryRepo = {
   getCategories: async function () {

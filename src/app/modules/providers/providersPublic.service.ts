@@ -1,6 +1,6 @@
-import { AppError } from "../../../shared/error/AppError";
-import { ProviderQueryType } from "./providerPublic.validation";
-import { providersPublicRepo } from "./providersPublic.repository";
+import { AppError } from "../../../shared/error/AppError.js";
+import { ProviderQueryType } from "./providerPublic.validation.js";
+import { providersPublicRepo } from "./providersPublic.repository.js";
 
 export const providersPublicService = {
   getProviders: async function (query: ProviderQueryType) {

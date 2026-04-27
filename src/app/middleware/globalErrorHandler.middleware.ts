@@ -1,5 +1,5 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
-import { AppError } from "../../shared/error/AppError";
+import { AppError } from "../../shared/error/AppError.js";
 import z from "zod";
 
 type ResponseType<T = unknown> = {

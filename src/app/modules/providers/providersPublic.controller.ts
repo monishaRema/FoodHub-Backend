@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { providersPublicService } from "./providersPublic.service";
-import { sendResponse } from "../../../shared/utils/sendResponse";
-import { AppError } from "../../../shared/error/AppError";
+import { providersPublicService } from "./providersPublic.service.js";
+import { sendResponse } from "../../../shared/utils/sendResponse.js";
+import { AppError } from "../../../shared/error/AppError.js";
 
 export const providersPublicController = {
   getProviders: async function (req: Request, res: Response) {

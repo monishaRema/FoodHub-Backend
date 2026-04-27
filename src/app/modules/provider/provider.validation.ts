@@ -2,7 +2,7 @@ import {
   DietaryType,
   MealAvailability,
   OrderStatus,
-} from "../../../../generated/prisma/enums";
+} from "../../../../generated/prisma/enums.js";
 import z from "zod";
 
 export const registerProviderSchema = z.object({

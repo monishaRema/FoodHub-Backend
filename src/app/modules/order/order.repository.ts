@@ -1,5 +1,5 @@
-import { Prisma } from "../../../../generated/prisma/client";
-import { prisma } from "../../../shared/lib/prisma";
+import { Prisma } from "../../../../generated/prisma/client.js";
+import { prisma } from "../../../shared/lib/prisma.js";
 
 type CreateOrderData = {
   userId: string;

@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
-import { AppError } from "../../../shared/error/AppError";
-import { config } from "../../config/env";
-import { authRepo } from "./auth.repository";
-import { LoginSchemaType, RegisterSchemaType } from "./auth.validation";
+import { AppError } from "../../../shared/error/AppError.js";
+import { config } from "../../config/env.js";
+import { authRepo } from "./auth.repository.js";
+import { LoginSchemaType, RegisterSchemaType } from "./auth.validation.js";
 import bcrypt from "bcryptjs";
-import { generateAccessToken, generateRefreshToken } from "./auth.utils";
-import { JwtPayload } from "./auth.types";
+import { generateAccessToken, generateRefreshToken } from "./auth.utils.js";
+import { JwtPayload } from "./auth.types.js";
 
 export const authService = {
   // Register user

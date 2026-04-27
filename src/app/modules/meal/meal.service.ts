@@ -1,7 +1,7 @@
-import { AppError } from "../../../shared/error/AppError";
-import { QueryType } from "../../../shared/validation";
-import { mealsRepo } from "./meal.repository";
-import { MealQueryType } from "./meal.validation";
+import { AppError } from "../../../shared/error/AppError.js";
+import { QueryType } from "../../../shared/validation/index.js";
+import { mealsRepo } from "./meal.repository.js";
+import { MealQueryType } from "./meal.validation.js";
 
 export const mealsService = {
   getMeals: async function (query: MealQueryType) {

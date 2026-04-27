@@ -1,12 +1,12 @@
-import { Prisma } from "../../../../generated/prisma/client";
+import { Prisma } from "../../../../generated/prisma/client.js";
 import {
   MealAvailability,
   OrderStatus,
-} from "../../../../generated/prisma/enums";
-import { AppError } from "../../../shared/error/AppError";
-import { QueryType } from "../../../shared/validation";
-import { ordersRepo } from "./order.repository";
-import { CreateOrderType } from "./order.validation";
+} from "../../../../generated/prisma/enums.js";
+import { AppError } from "../../../shared/error/AppError.js";
+import { QueryType } from "../../../shared/validation/index.js";
+import { ordersRepo } from "./order.repository.js";
+import { CreateOrderType } from "./order.validation.js";
 
 const cancellableStatuses: OrderStatus[] = [
   OrderStatus.PENDING,

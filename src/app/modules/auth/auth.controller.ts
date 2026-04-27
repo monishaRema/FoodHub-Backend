@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { authService } from "./auth.service";
-import { sendResponse } from "../../../shared/utils/sendResponse";
-import { clearCookie, setCookie } from "./auth.utils";
-import { AppError } from "../../../shared/error/AppError";
-import { cookieNames } from "../../constants";
+import { authService } from "./auth.service.js";
+import { sendResponse } from "../../../shared/utils/sendResponse.js";
+import { clearCookie, setCookie } from "./auth.utils.js";
+import { AppError } from "../../../shared/error/AppError.js";
+import { cookieNames } from "../../constants/index.js";
 
 
 

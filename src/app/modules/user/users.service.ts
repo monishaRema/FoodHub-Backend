@@ -1,7 +1,7 @@
-import { AppError } from "../../../shared/error/AppError";
-import { QueryType } from "../../../shared/validation";
-import { userRepo } from "./users.repository";
-import { UserStatusType } from "./users.validation";
+import { AppError } from "../../../shared/error/AppError.js";
+import { QueryType } from "../../../shared/validation/index.js";
+import { userRepo } from "./users.repository.js";
+import { UserStatusType } from "./users.validation.js";
 
 export const userService = {
   getUsers: async function (query: QueryType) {

@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { authorize } from "../../middleware/authorize.middleware";
-import { validateRequest } from "../../middleware/validateRequest.middleware";
-import { idParamsSchema } from "../../../shared/validation";
-import { categoryController } from "./category.controller";
-import { categorySchema, updateCategorySchema } from "./category.validation";
+import { authorize } from "../../middleware/authorize.middleware.js";
+import { validateRequest } from "../../middleware/validateRequest.middleware.js";
+import { idParamsSchema } from "../../../shared/validation/index.js";
+import { categoryController } from "./category.controller.js";
+import { categorySchema, updateCategorySchema } from "./category.validation.js";
 
 export const categoryRouter = Router();
 

@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { providersPublicController } from "./providersPublic.controller";
-import { validateRequest } from "../../middleware/validateRequest.middleware";
-import { idParamsSchema } from "../../../shared/validation";
-import { providerQuerySchema } from "./providerPublic.validation";
+import { providersPublicController } from "./providersPublic.controller.js";
+import { validateRequest } from "../../middleware/validateRequest.middleware.js";
+import { idParamsSchema } from "../../../shared/validation/index.js";
+import { providerQuerySchema } from "./providerPublic.validation.js";
 
 export const providerPublicRouter = Router();
 

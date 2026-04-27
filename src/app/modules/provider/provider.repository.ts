@@ -1,10 +1,10 @@
-import { OrderStatus } from "../../../../generated/prisma/enums";
+import { OrderStatus } from "../../../../generated/prisma/enums.js";
 import {
   MealCreateManyInput,
   MealUncheckedUpdateInput,
   ProviderCreateManyInput,
-} from "../../../../generated/prisma/models";
-import { prisma } from "../../../shared/lib/prisma";
+} from "../../../../generated/prisma/models.js";
+import { prisma } from "../../../shared/lib/prisma.js";
 
 
 export const providerRepo = {

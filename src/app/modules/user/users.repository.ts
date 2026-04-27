@@ -1,7 +1,7 @@
 
-import { Prisma } from "../../../../generated/prisma/client";
-import { UserStatus } from "../../../../generated/prisma/enums"
-import { prisma } from "../../../shared/lib/prisma"
+import { Prisma } from "../../../../generated/prisma/client.js";
+import { UserStatus } from "../../../../generated/prisma/enums.js"
+import { prisma } from "../../../shared/lib/prisma.js"
 
 
 const safeUserSelect = {

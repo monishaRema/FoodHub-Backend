@@ -1,16 +1,16 @@
-import { OrderStatus, Prisma } from "../../../../generated/prisma/client";
-import { MealUncheckedUpdateInput } from "../../../../generated/prisma/models";
+import { OrderStatus, Prisma } from "../../../../generated/prisma/client.js";
+import { MealUncheckedUpdateInput } from "../../../../generated/prisma/models.js";
 
-import { AppError } from "../../../shared/error/AppError";
-import { QueryType } from "../../../shared/validation";
-import { providerRepo } from "./provider.repository";
+import { AppError } from "../../../shared/error/AppError.js";
+import { QueryType } from "../../../shared/validation/index.js";
+import { providerRepo } from "./provider.repository.js";
 import {
   CreteMealSchemaType,
   ProviderMealQueryType,
   RegisterProviderSchemaType,
   UpdateMealSchemaType,
   UpdateOrderStatusType,
-} from "./provider.validation";
+} from "./provider.validation.js";
 
 export const providerService = {
   // Become Provider

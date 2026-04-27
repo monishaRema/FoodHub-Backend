@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
-import { UserRoleValue } from "../constants"
-import { AppError } from "../../shared/error/AppError";
+import { UserRoleValue } from "../constants/index.js"
+import { AppError } from "../../shared/error/AppError.js";
 
 export const authorize = (...roles: UserRoleValue[]) => {
     return (req: Request, _res: Response, next: NextFunction) => {

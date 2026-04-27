@@ -1,8 +1,8 @@
 import { Response } from "express";
-import { config } from "../../config/env";
-import { JwtPayload } from "./auth.types";
+import { config } from "../../config/env.js";
+import { JwtPayload } from "./auth.types.js";
 import jwt from "jsonwebtoken";
-import { CookieNameValue } from "../../constants";
+import { CookieNameValue } from "../../constants/index.js";
 
 
 export const generateAccessToken = (payload: JwtPayload) => {

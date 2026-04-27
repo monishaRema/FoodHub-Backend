@@ -1,7 +1,7 @@
-import { Prisma } from "../../../../generated/prisma/client";
-import { DietaryType, MealAvailability } from "../../../../generated/prisma/enums";
-import { MealWhereInput } from "../../../../generated/prisma/models";
-import { prisma } from "../../../shared/lib/prisma";
+import { Prisma } from "../../../../generated/prisma/client.js";
+import { DietaryType, MealAvailability } from "../../../../generated/prisma/enums.js";
+import { MealWhereInput } from "../../../../generated/prisma/models.js";
+import { prisma } from "../../../shared/lib/prisma.js";
 
 type MealQueryParams = {
   take: number;

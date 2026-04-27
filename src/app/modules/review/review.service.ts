@@ -1,7 +1,7 @@
-import { OrderStatus } from "../../../../generated/prisma/enums";
-import { AppError } from "../../../shared/error/AppError";
-import { reviewRepo } from "./review.repository";
-import { CreateReviewType } from "./review.validation";
+import { OrderStatus } from "../../../../generated/prisma/enums.js";
+import { AppError } from "../../../shared/error/AppError.js";
+import { reviewRepo } from "./review.repository.js";
+import { CreateReviewType } from "./review.validation.js";
 
 export const reviewService = {
   createReview: async function (userId: string, payload: CreateReviewType) {

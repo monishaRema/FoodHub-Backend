@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { categoryService } from "./category.service";
-import { AppError } from "../../../shared/error/AppError";
-import { sendResponse } from "../../../shared/utils/sendResponse";
+import { categoryService } from "./category.service.js";
+import { AppError } from "../../../shared/error/AppError.js";
+import { sendResponse } from "../../../shared/utils/sendResponse.js";
 
 export const categoryController = {
   getCategories: async function (_req: Request, res: Response) {

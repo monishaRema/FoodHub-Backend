@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { providerController } from "./provider.controller";
-import { validateRequest } from "../../middleware/validateRequest.middleware";
+import { providerController } from "./provider.controller.js";
+import { validateRequest } from "../../middleware/validateRequest.middleware.js";
 import {
   createMealSchema,
   providerMealQuerySchema,
   registerProviderSchema,
   updateMealSchema,
   updateOrderStatusSchema,
-} from "./provider.validation";
-import { authorize } from "../../middleware/authorize.middleware";
-import { idParamsSchema, querySchema } from "../../../shared/validation";
+} from "./provider.validation.js";
+import { authorize } from "../../middleware/authorize.middleware.js";
+import { idParamsSchema, querySchema } from "../../../shared/validation/index.js";
 
 export const providerRouter = Router();
 

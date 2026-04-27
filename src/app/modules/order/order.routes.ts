@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { validateRequest } from "../../middleware/validateRequest.middleware";
-import { createOrderSchema } from "./order.validation";
-import { ordersController } from "./order.controller";
-import { idParamsSchema, querySchema } from "../../../shared/validation";
+import { validateRequest } from "../../middleware/validateRequest.middleware.js";
+import { createOrderSchema } from "./order.validation.js";
+import { ordersController } from "./order.controller.js";
+import { idParamsSchema, querySchema } from "../../../shared/validation/index.js";
 
 export const orderRouter = Router();
 

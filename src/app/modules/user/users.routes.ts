@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { userController } from "./users.controller";
-import { validateRequest } from "../../middleware/validateRequest.middleware";
-import {  userStatusSchema } from "./users.validation";
-import { idParamsSchema, querySchema } from "../../../shared/validation";
+import { userController } from "./users.controller.js";
+import { validateRequest } from "../../middleware/validateRequest.middleware.js";
+import {  userStatusSchema } from "./users.validation.js";
+import { idParamsSchema, querySchema } from "../../../shared/validation/index.js";
 
 export const userRouter = Router();
 

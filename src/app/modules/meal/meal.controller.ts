@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { mealsService } from "./meal.service";
-import { sendResponse } from "../../../shared/utils/sendResponse";
-import { AppError } from "../../../shared/error/AppError";
-import { RequestParts } from "../../constants";
+import { mealsService } from "./meal.service.js";
+import { sendResponse } from "../../../shared/utils/sendResponse.js";
+import { AppError } from "../../../shared/error/AppError.js";
+import { RequestParts } from "../../constants/index.js";
 
 export const mealsController = {
   getMeals: async function (req: Request, res: Response) {

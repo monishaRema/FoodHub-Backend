@@ -1,7 +1,7 @@
 import { email } from "zod";
-import { Prisma } from "../../../../generated/prisma/client";
-import { UserCreateInput } from "../../../../generated/prisma/models";
-import { prisma } from "../../../shared/lib/prisma";
+import { Prisma } from "../../../../generated/prisma/client.js";
+import { UserCreateInput } from "../../../../generated/prisma/models.js";
+import { prisma } from "../../../shared/lib/prisma.js";
 
 const safeUserSelect = {
   id: true,

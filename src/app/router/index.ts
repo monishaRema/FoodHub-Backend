@@ -1,15 +1,15 @@
-import { authorize } from './../middleware/authorize.middleware';
-import { authenticate } from './../middleware/authenticate.middleware';
+import { authorize } from './../middleware/authorize.middleware.js';
+import { authenticate } from './../middleware/authenticate.middleware.js';
 import { Request, Response, Router } from "express";
-import { sendResponse } from "../../shared/utils/sendResponse";
-import { authRouter } from "../modules/auth/auth.routes";
-import { providerRouter } from "../modules/provider/provider.route";
-import { providerPublicRouter } from '../modules/providers/providersPublic.routes';
-import { mealsRouter } from '../modules/meal/meal.routes';
-import { categoryRouter } from '../modules/category/category.routes';
-import { orderRouter } from '../modules/order/order.routes';
-import { userRouter } from '../modules/user/users.routes';
-import { reviewRouter } from '../modules/review/review.routes';
+import { sendResponse } from "../../shared/utils/sendResponse.js";
+import { authRouter } from "../modules/auth/auth.routes.js";
+import { providerRouter } from "../modules/provider/provider.route.js";
+import { providerPublicRouter } from '../modules/providers/providersPublic.routes.js';
+import { mealsRouter } from '../modules/meal/meal.routes.js';
+import { categoryRouter } from '../modules/category/category.routes.js';
+import { orderRouter } from '../modules/order/order.routes.js';
+import { userRouter } from '../modules/user/users.routes.js';
+import { reviewRouter } from '../modules/review/review.routes.js';
 
 
 

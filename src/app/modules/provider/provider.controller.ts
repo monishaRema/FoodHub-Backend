@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { AppError } from "../../../shared/error/AppError";
-import { providerService } from "./provider.service";
-import { sendResponse } from "../../../shared/utils/sendResponse";
-import { RequestParts } from "../../constants";
+import { AppError } from "../../../shared/error/AppError.js";
+import { providerService } from "./provider.service.js";
+import { sendResponse } from "../../../shared/utils/sendResponse.js";
+import { RequestParts } from "../../constants/index.js";
 
 export const providerController = {
   // Become Provider

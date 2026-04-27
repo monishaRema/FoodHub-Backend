@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { userService } from "./users.service";
-import { RequestParts } from "../../constants";
-import { sendResponse } from "../../../shared/utils/sendResponse";
-import { AppError } from "../../../shared/error/AppError";
+import { userService } from "./users.service.js";
+import { RequestParts } from "../../constants/index.js";
+import { sendResponse } from "../../../shared/utils/sendResponse.js";
+import { AppError } from "../../../shared/error/AppError.js";
 
 export const userController = {
   getUsers: async function (req: Request, res: Response) {

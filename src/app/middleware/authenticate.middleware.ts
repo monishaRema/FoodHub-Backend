@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
 import jwt from "jsonwebtoken";
-import { config } from "../config/env";
-import { AppError } from "../../shared/error/AppError";
-import { JwtPayload } from "../modules/auth/auth.types";
-import { cookieNames } from "../constants";
+import { config } from "../config/env.js";
+import { AppError } from "../../shared/error/AppError.js";
+import { JwtPayload } from "../modules/auth/auth.types.js";
+import { cookieNames } from "../constants/index.js";
 
 export const authenticate = (
   req: Request,

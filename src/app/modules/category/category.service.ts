@@ -1,5 +1,5 @@
-import { AppError } from "../../../shared/error/AppError";
-import { categoryRepo } from "./category.repository";
+import { AppError } from "../../../shared/error/AppError.js";
+import { categoryRepo } from "./category.repository.js";
 
 export const categoryService = {
   getCategories: async function () {

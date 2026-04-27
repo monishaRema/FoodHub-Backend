@@ -1,7 +1,7 @@
-import { validateRequest } from "./../../middleware/validateRequest.middleware";
+import { validateRequest } from "./../../middleware/validateRequest.middleware.js";
 import { Router } from "express";
-import { reviewController } from "./review.controller";
-import { createReviewSchema } from "./review.validation";
+import { reviewController } from "./review.controller.js";
+import { createReviewSchema } from "./review.validation.js";
 
 export const reviewRouter = Router();
 // Post api/review
