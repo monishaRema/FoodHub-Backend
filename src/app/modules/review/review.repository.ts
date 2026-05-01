@@ -36,6 +36,33 @@ export const reviewRepo = {
       },
     },
   });
-},
+  },
+
+  getOrderByUserIdAndMealId: async function(userId: string, mealId: string){
+    return await prisma.order.findFirst({
+      where:{
+        userId,
+        orderItems:{
+          some:{
+            mealId
+          }
+        }
+      },
+      select:{
+        id:true,
+        userId:true,
+        providerId:true,
+        status:true,
+        orderItems:{
+          select:{
+            mealId:true
+          }
+        }
+      }
+    })
+  }
+ 
+  
+ 
  
 };

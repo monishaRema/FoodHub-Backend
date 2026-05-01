@@ -14,7 +14,8 @@ export const providersPublicController = {
       res,
       statusCode: 200,
       message: "Fetched providers successfully",
-      data: providers,
+      data: providers.data,
+      meta: providers.meta,
     });
   },
   getSingleProvider: async function (req: Request, res: Response) {
@@ -33,4 +34,17 @@ export const providersPublicController = {
       data: provider,
     });
   },
+   getMealsByProviderId: async function (req: Request, res: Response) {
+      if (!req.params.id) {
+        throw new AppError(401, "ProviderId is required");
+      }
+      const meals = await providersPublicService.getMealsByProviderId(req.params.id as string, res.locals.query);
+      sendResponse({
+        res,
+        statusCode: 200,
+        message: "Fetched meals by provider successfully",
+        data: meals.data,
+        meta: meals.meta,
+      });
+    },
 };

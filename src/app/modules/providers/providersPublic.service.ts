@@ -1,4 +1,5 @@
 import { AppError } from "../../../shared/error/AppError.js";
+import { MealQueryType } from "../meal/meal.validation.js";
 import { ProviderQueryType } from "./providerPublic.validation.js";
 import { providersPublicRepo } from "./providersPublic.repository.js";
 
@@ -25,4 +26,12 @@ export const providersPublicService = {
 
     return provider;
   },
+
+   getMealsByProviderId: async function (providerId: string, query: MealQueryType) {
+      const take = query.limit ?? 10;
+      const page = query.page ?? 1;
+      const skip = (page - 1) * take;
+      
+      return await providersPublicRepo.getMealsByProviderId(providerId, take, skip);
+    },
 };

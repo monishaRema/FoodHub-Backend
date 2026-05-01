@@ -55,7 +55,14 @@ export const ordersRepo = {
     });
   },
   getOrders: async function (userId: string, take: number, skip: number) {
-    return await prisma.order.findMany({
+
+    const ordersCount = await prisma.order.count({
+      where: {
+        userId,
+      },
+    });
+
+    const orders = await prisma.order.findMany({
       where: {
         userId,
       },
@@ -91,6 +98,16 @@ export const ordersRepo = {
         },
       },
     });
+    
+    return {
+      data: orders,
+      meta:{
+        page: Math.ceil(skip / take) + 1,
+        limit: take,
+        totalItems: ordersCount,
+        totalPage: Math.ceil(ordersCount / take),
+      },
+    };
   },
   getSingleOrder: async function (id: string) {
     return await prisma.order.findUnique({

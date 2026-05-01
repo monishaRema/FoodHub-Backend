@@ -16,6 +16,19 @@ export const mealsController = {
       data: meals,
     });
   },
+  getFeaturedMeals: async function (req: Request, res: Response) {
+
+    const meals = await mealsService.getFeaturedMeals(res.locals.query);
+
+    sendResponse({
+      res,
+      statusCode: 200,
+      message: "Fetched featured meals successfully",
+      data: meals.data,
+      meta: meals.meta,
+    });
+  },
+ 
   getSingleMeal: async function (req: Request, res: Response) {
     if (!req.params.id) {
       throw new AppError(401, "Id is required");

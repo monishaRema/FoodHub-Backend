@@ -12,7 +12,8 @@ export const userController = {
       res,
       statusCode: 200,
       message: "User Fetched successfully",
-      data: users,
+      data: users.data,
+      meta: users.meta,
     });
   },
   updateUserStatus: async function (req: Request, res: Response) {

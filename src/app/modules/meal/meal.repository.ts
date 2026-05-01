@@ -52,22 +52,134 @@ export const mealsRepo = {
       ...(orConditions.length > 0 ? { OR: orConditions } : {}),
     };
 
-    return await prisma.meal.findMany({
+
+
+    const total = await prisma.meal.count({
       where: whereCondition,
+    });
+
+    const meals = await prisma.meal.findMany({
+      where: whereCondition,
+      select:{
+        id:true,
+        name:true,
+        image:true,
+        price:true,
+        providerId:true,
+        dietary:true,
+        excerpt:true,
+        isFeatured:true,
+        availability:true,
+        category:{
+          select:{
+            name:true,
+          }
+        },
+      },
       take: query.take,
       skip: query.skip,
       orderBy: {
         [query.sortBy]: query.sortOrder,
       },
     });
+    
+    return {
+      data: meals,
+      meta: {
+        page: Math.ceil(query.skip / query.take) + 1,
+        limit: query.take,
+        totalItems: total,
+        totalPage: Math.ceil(total / query.take),
+      }
+    };
+  },
+  getFeaturedMeals: async function (take:number, skip: number) {
+
+    const total = await prisma.meal.count({
+      where: {
+        isFeatured: true,
+        availability: MealAvailability.AVAILABLE,
+      },
+      
+    });
+
+    const meals = await prisma.meal.findMany({
+      where: {
+        isFeatured: true,
+        availability: MealAvailability.AVAILABLE,
+      },
+       select:{
+        id:true,
+        name:true,
+        image:true,
+        price:true,
+        providerId:true,
+        dietary:true,
+        excerpt:true,
+        isFeatured:true,
+        availability:true,
+        category:{
+          select:{
+            name:true,
+          }
+        }
+      },
+      take: take,
+      skip: skip,
+    });    
+    return {
+      data: meals,
+      meta: {
+        page: Math.ceil(skip / take) + 1,
+        limit: take,
+        totalItems: total,
+        totalPage: Math.ceil(total / take),
+      }
+    }
+
+
   },
   getSingleMeal: async function (id: string) {
     return await prisma.meal.findUnique({
       where: {
         id,
       },
+      select:{
+        id:true,
+        name:true,
+        image:true,
+        price:true,
+        providerId:true,
+        details:true,
+        dietary:true,
+        excerpt:true,
+        isFeatured:true,
+        availability:true,
+        createdAt:true,
+        updatedAt:true,
+        category:{
+          select:{
+            name:true,
+          }
+        },
+        provider:{
+          select:{
+            shopName:true,
+          }
+        },
+        reviews:{
+          select:{
+            id:true,
+            rating:true,
+            content:true,
+            createdAt:true,
+           
+          }
+        },
+      }
     });
   },
+ 
 
   getReviewsByMealId: async function (mealId:string,take:number,skip:number) {
 

@@ -12,8 +12,8 @@ const envSchema = z.object({
     .string()
     .min(1, "JWT_REFRESH_TOKEN_SECRET is required"),
 
-  JWT_REFRESH_TOKEN_EXPIRED_IN: z.string().default("7d"),
-  JWT_ACCESS_TOKEN_EXPIRED_IN: z.string().default("1h"),
+  JWT_REFRESH_TOKEN_EXPIRED_IN: z.string().default("30d"),
+  JWT_ACCESS_TOKEN_EXPIRED_IN: z.string().default("3d"),
   BCRYPT_SALT_ROUNDS: z.coerce.number().int().positive().default(10),
   FRONTEND_URL: z.string().min(1, "Frontend Url is required"),
   isProduction: z.boolean().optional().default(false),

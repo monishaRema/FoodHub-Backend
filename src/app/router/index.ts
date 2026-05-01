@@ -21,7 +21,7 @@ router.get("/", (_req:Request,res:Response) => {
    sendResponse({
     res,
     statusCode:200,
-    message:"Server running healthy"
+    message:"Welcome to FoodHub backend server"
    })
 })
 

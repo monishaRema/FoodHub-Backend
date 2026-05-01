@@ -49,5 +49,55 @@ export const reviewService = {
       content: payload.content,
     });
   },
- 
+
+  checkEligibility: async function (userId: string, mealId: string) {
+    const order = await reviewRepo.getOrderByUserIdAndMealId(userId, mealId);
+    if (!order) {
+      return {
+        eligibility: false,
+        message: "You haven't ordered this meal yet",
+      };
+    }
+
+    if (order.userId !== userId) {
+      return {
+        eligibility: false,
+        message: "You can review only your own order",
+      };
+    }
+
+    if (order.status !== OrderStatus.DELIVERED) {
+      return {
+        eligibility: false,
+        message: "You can review only after the order is delivered",
+      };
+    }
+
+    const orderedItem = order.orderItems.find((item) => item.mealId === mealId);
+
+    if (!orderedItem) {
+      return {
+        eligibility: false,
+        message: "You can review only meals included in this order",
+      };
+    }
+
+    const existingReview = await reviewRepo.getReviewByUserAndMeal(
+      userId,
+      orderedItem.mealId,
+    );
+
+    if (existingReview) {
+      return {
+        eligibility: false,
+        message: "You have already reviewed this meal",
+      };
+    }
+
+    return {
+      eligibility: true,
+      orderId: order.id,
+      message: "You are eligible to review this meal",
+    };
+  },
 };

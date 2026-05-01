@@ -19,11 +19,21 @@ const safeUserSelect = {
 export const userRepo = {
     getUsers:async function(take:number,skip:number){
 
-        return await prisma.user.findMany({
+        const users = await prisma.user.findMany({
             take:take,
             skip:skip,
             select:safeUserSelect
         })
+        const total = await prisma.user.count()
+        return { 
+            data: users,
+            meta:{
+                 page: 1,
+                 limit: take,
+                 totalItems: total,
+                 totalPage: Math.ceil(total / take)
+            }
+        };
     },
 
     getUserById:async function(id:string){

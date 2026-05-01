@@ -10,6 +10,7 @@ export const mealsRouter= Router();
 
 
 mealsRouter.get("/",validateRequest(mealQuerySchema,"query"),mealsController.getMeals)
+mealsRouter.get("/featured",validateRequest(querySchema,"query"),mealsController.getFeaturedMeals)
 mealsRouter.get("/:id",validateRequest(idParamsSchema,"params"),mealsController.getSingleMeal)
 mealsRouter.get(
   "/:id/reviews",

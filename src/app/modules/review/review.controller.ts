@@ -20,5 +20,22 @@ export const reviewController = {
         })
 
     },
+    checkEligibility:async function(req:Request,res:Response){
+
+        if(!req.user){
+            throw new AppError(403,"Forbidden: You can not check eligibility")
+        }
+
+
+        const eligibility = await reviewService.checkEligibility(req.user.userId,req.params.id as string)
+
+        sendResponse({
+            res,
+            statusCode:200,
+            message:"Eligibility checked successfully",
+            data:eligibility
+        })
+
+    },
    
 }

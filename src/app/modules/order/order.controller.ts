@@ -31,7 +31,8 @@ export const ordersController = {
       res,
       statusCode: 200,
       message: "Order fetched successfully",
-      data: orders,
+      data: orders.data,
+      meta: orders.meta,
     });
   },
   getSingleOrder: async function (req: Request, res: Response) {

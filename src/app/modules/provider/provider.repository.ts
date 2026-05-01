@@ -74,6 +74,25 @@ export const providerRepo = {
       orderBy: {
         createdAt: "desc",
       },
+      select:{
+        id:true,
+        name:true,
+        image:true,
+        price:true,
+        dietary:true,
+        excerpt:true,
+        details:true,
+        categoryId:true,
+        isFeatured:true,
+        availability:true,
+        createdAt:true,
+        updatedAt:true,
+        category:{
+          select:{
+            name:true,
+          }
+        }
+      }
     });
   },
 
@@ -83,6 +102,26 @@ export const providerRepo = {
       where: {
         id,
       },
+      select:{
+        id:true,
+        name:true,
+        image:true,
+        price:true,
+        providerId:true,
+        dietary:true,
+        excerpt:true,
+        details:true,
+        categoryId:true,
+        isFeatured:true,
+        availability:true,
+        createdAt:true,
+        updatedAt:true,
+        category:{
+          select:{
+            name:true,
+          }
+        }
+      }
     });
   },
 

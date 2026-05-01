@@ -59,14 +59,17 @@ export const authController = {
        throw new AppError(401, "Refresh token required");
     }
 
-    const token = await authService.refreshToken(refreshToken)
+    const accessToken = await authService.refreshToken(refreshToken)
 
-    setCookie(res, cookieNames.accessToken, token, 60 * 60 * 1000)
+    setCookie(res, cookieNames.accessToken, accessToken, 60 * 60 * 1000)
 
     sendResponse({
       res,
       statusCode: 200,
       message: "token refreshed successfully",
+      data: {
+        accessToken,
+      },
     });
 
   },

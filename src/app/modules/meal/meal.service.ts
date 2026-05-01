@@ -17,6 +17,13 @@ export const mealsService = {
       search: query.search || null,
     });
   },
+  getFeaturedMeals: async function (query: MealQueryType) {
+    const take = query.limit ?? 10;
+    const page = query.page ?? 1;
+    const skip = (page - 1) * take;
+
+    return await mealsRepo.getFeaturedMeals(take, skip);
+  },
   getSingleMeal: async function (id: string) {
     const meal = await mealsRepo.getSingleMeal(id);
 
@@ -26,6 +33,7 @@ export const mealsService = {
 
     return meal;
   },
+ 
 
    getReviewsByMealId:async function(mealId:string,query:QueryType){
 
