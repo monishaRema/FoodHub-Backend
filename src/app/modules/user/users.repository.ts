@@ -28,7 +28,7 @@ export const userRepo = {
         return { 
             data: users,
             meta:{
-                 page: 1,
+                 page:  Math.floor(skip / take) + 1,
                  limit: take,
                  totalItems: total,
                  totalPage: Math.ceil(total / take)

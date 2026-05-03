@@ -10,6 +10,7 @@ import { categoryRouter } from '../modules/category/category.routes.js';
 import { orderRouter } from '../modules/order/order.routes.js';
 import { userRouter } from '../modules/user/users.routes.js';
 import { reviewRouter } from '../modules/review/review.routes.js';
+import { adminOrdersRouter } from '../modules/admin-orders/admin-order.routes.js';
 
 
 
@@ -31,5 +32,6 @@ router.use("/providers",providerPublicRouter)
 router.use("/provider",authenticate, providerRouter)
 router.use("/admin/category",authenticate,categoryRouter)
 router.use("/admin/users",authenticate,authorize("ADMIN"),userRouter)
+router.use("/admin/orders",authenticate,authorize("ADMIN"),adminOrdersRouter)
 router.use("/orders",authenticate,orderRouter)
 router.use("/reviews",authenticate,reviewRouter)

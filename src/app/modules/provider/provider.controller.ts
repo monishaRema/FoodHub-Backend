@@ -53,7 +53,8 @@ export const providerController = {
       res,
       statusCode: 200,
       message: "Fetched meals successfully",
-      data: meals,
+      data: meals.data,
+      meta: meals.meta,
     });
   },
 
@@ -138,7 +139,8 @@ export const providerController = {
       res,
       statusCode: 200,
       message: "Fetched orders successfully",
-      data: orders,
+      data: orders.data,
+      meta: orders.meta,
     });
   },
 
@@ -150,6 +152,7 @@ export const providerController = {
     if (!req.params.id) {
       throw new AppError(400, "Params is required");
     }
+ 
 
     const updateOrder = await providerService.updateOrderStatus(
        req.user.userId,

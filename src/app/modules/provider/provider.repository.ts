@@ -65,7 +65,7 @@ export const providerRepo = {
 
   // Get All Meal
   getMeals: async function (providerId: string,take:number,skip:number) {
-    return await prisma.meal.findMany({
+    const meals =  await prisma.meal.findMany({
       where: {
         providerId,
       },
@@ -94,6 +94,20 @@ export const providerRepo = {
         }
       }
     });
+    const mealCount = await prisma.meal.count({
+      where: {
+        providerId,
+      },
+    });
+    return {
+      data:meals,
+      meta:{
+        page:Math.ceil(skip / take) + 1,
+        limit:take,
+        totalItems:mealCount,
+        totalPage:Math.ceil(mealCount / take)
+      }
+    };
   },
 
   // Get Single Meal
@@ -147,7 +161,7 @@ export const providerRepo = {
 
   getOrdersByProvider:async function(providerId:string,take:number,skip:number){
 
-    return await prisma.order.findMany({
+    const orders = await prisma.order.findMany({
       where:{
         providerId
       },
@@ -168,10 +182,15 @@ export const providerRepo = {
             shopName: true,
           },
         },
+        user:{
+          select:{
+            name:true,
+            email:true,
+          }
+        },
 
         orderItems: {
           select: {
-            id: true,
             mealId: true,
             mealNameSnapshot: true,
             quantity: true,
@@ -180,6 +199,21 @@ export const providerRepo = {
         },
       }
     })
+    const orderCount = await prisma.order.count({
+      where:{
+        providerId
+      }
+    })
+
+    return {
+      data:orders,
+      meta:{
+        page:Math.ceil(skip / take) + 1,
+        limit:take,
+        totalItems:orderCount,
+        totalPage:Math.ceil(orderCount / take)
+      }
+    }
 
   },
   getOrderById:async function(orderId:string){
