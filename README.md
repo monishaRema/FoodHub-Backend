@@ -1,34 +1,39 @@
 # FoodHub Backend
 
-FoodHub Backend is a TypeScript and Express API for a multi-role meal ordering platform. It supports public meal browsing, customer ordering, provider meal management, and admin moderation features on top of a PostgreSQL database with Prisma.
+FoodHub Backend is a TypeScript + Express API for a multi-role meal ordering platform. It supports public meal browsing, customer ordering, provider operations, and admin management on top of PostgreSQL with Prisma.
 
 ## Overview
 
-The backend is organized around three roles:
+The API is mounted under `/api` and uses cookie-based JWT authentication for protected endpoints.
+
+Roles used by the system:
 
 - `CUSTOMER`
 - `PROVIDER`
 - `ADMIN`
 
-Core business rules enforced by the project:
+Core business rules enforced in code:
 
-- one order belongs to one provider
-- meals are provider-owned
+- one order can contain meals from only one provider
+- only `AVAILABLE` meals can be ordered
+- duplicate meal ids in one order are rejected
 - only delivered orders can be reviewed
 - one user can review a meal only once
-- order status follows a strict lifecycle
+- provider order updates follow a strict status progression
 
 ## Current Capabilities
 
 ### Public
 
-- health check
-- register and login
+- health check via `GET /api/`
+- register, login, logout, refresh token, and current-user lookup
 - browse meals
+- browse featured meals
 - view a single meal
 - view reviews for a meal
 - browse providers
 - view a single provider
+- view meals offered by a provider
 
 ### Customer
 
@@ -37,6 +42,7 @@ Core business rules enforced by the project:
 - list own orders
 - read own order details
 - cancel eligible orders
+- check whether a meal is reviewable
 - create reviews after delivery
 
 ### Provider
@@ -48,13 +54,15 @@ Core business rules enforced by the project:
 
 ### Admin
 
+- list all orders
+- read a single order
 - list users
 - update user status
 - list categories
-- read one category
+- read a single category
 - create, update, and delete categories
 
-## API Overview
+## API Surface
 
 Base path:
 
@@ -70,13 +78,21 @@ Main route groups:
 - reviews: `/reviews/*`
 - admin categories: `/admin/category/*`
 - admin users: `/admin/users/*`
+- admin orders: `/admin/orders/*`
 
-Authentication and authorization:
+## Authentication and Security
 
-- JWT-based authentication
-- tokens are stored in `httpOnly` cookies
-- protected routes use the `access-token` cookie
-- role checks are enforced with middleware
+- JWT access and refresh tokens are stored in `httpOnly` cookies
+- protected routes read the `access-token` cookie
+- refresh uses the `refresh-token` cookie
+- cookies use `sameSite: "strict"`
+- cookies use `secure: true` only when `NODE_ENV=PROD`
+- global rate limiter is enabled for all routes
+- a second auth-specific rate limiter is enabled for `/api/auth/*`
+
+Important implementation note:
+
+- authentication middleware validates the token and role claims, but suspended-user checks are enforced during login and refresh rather than on every protected request
 
 ## Order Lifecycle
 
@@ -91,17 +107,23 @@ Customer cancellation:
 
 ## Response Shape
 
-Successful responses use this shape:
+Successful responses use:
 
 ```json
 {
   "success": true,
   "message": "Operation completed",
-  "data": {}
+  "data": {},
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 1,
+    "totalPage": 1
+  }
 }
 ```
 
-Validation and application errors use this shape:
+Error responses use:
 
 ```json
 {
@@ -116,40 +138,21 @@ Validation and application errors use this shape:
 }
 ```
 
-## Tech Stack
+`meta` appears only on paginated endpoints.
 
-### Runtime and Framework
+## Environment Variables
 
-- Node.js
-- Express 5
-- TypeScript
+Required runtime configuration in `.env`:
 
-### Database
-
-- PostgreSQL
-- Prisma ORM
-- `@prisma/adapter-pg`
-
-### Auth, Validation, and Security
-
-- `jsonwebtoken`
-- `bcryptjs`
-- `zod`
-- `helmet`
-- `cors`
-- `cookie-parser`
-- `express-rate-limit`
-
-### Tooling
-
-- `tsx`
-- `dotenv`
-- `pnpm`
-
-Architecture style:
-
-- modular monolith
-- layered flow: `route -> controller -> service -> repository`
+- `DATABASE_URL`
+- `PORT`
+- `NODE_ENV` as `DEV`, `PROD`, or `TEST`
+- `JWT_ACCESS_TOKEN_SECRET`
+- `JWT_REFRESH_TOKEN_SECRET`
+- `JWT_ACCESS_TOKEN_EXPIRED_IN`
+- `JWT_REFRESH_TOKEN_EXPIRED_IN`
+- `BCRYPT_SALT_ROUNDS`
+- `FRONTEND_URL`
 
 ## Getting Started
 
@@ -159,25 +162,11 @@ Architecture style:
 - pnpm
 - PostgreSQL
 
-### Install dependencies
+### Install
 
 ```bash
 pnpm install
 ```
-
-### Configure environment
-
-Set these values in `.env` before starting the app:
-
-- `DATABASE_URL`
-- `PORT`
-- `NODE_ENV`
-- `JWT_ACCESS_TOKEN_SECRET`
-- `JWT_REFRESH_TOKEN_SECRET`
-- `JWT_ACCESS_TOKEN_EXPIRED_IN`
-- `JWT_REFRESH_TOKEN_EXPIRED_IN`
-- `BCRYPT_SALT_ROUNDS`
-- `FRONTEND_URL`
 
 ### Prisma workflow
 
@@ -188,7 +177,7 @@ pnpm p:gen
 pnpm p:migrate
 ```
 
-### Run in development
+### Development
 
 ```bash
 pnpm dev
@@ -216,21 +205,21 @@ pnpm p:studio
 
 ## Available Scripts
 
-- `pnpm dev` - run the development server with `tsx watch`
-- `pnpm type-check` - run TypeScript without emitting files
-- `pnpm build` - build the project into `dist`
-- `pnpm start` - start the built server
-- `pnpm p:format` - format the Prisma schema
-- `pnpm p:validate` - validate the Prisma schema
-- `pnpm p:gen` - generate Prisma client
-- `pnpm p:migrate` - run Prisma development migrations
-- `pnpm p:reset` - reset the database with Prisma migrations
-- `pnpm p:deploy` - deploy Prisma migrations
-- `pnpm p:studio` - open Prisma Studio
+- `pnpm dev` runs the development server with `tsx watch`
+- `pnpm type-check` runs TypeScript without emitting files
+- `pnpm build` generates Prisma client and builds to `dist`
+- `pnpm start` starts the compiled server
+- `pnpm p:format` formats the Prisma schema
+- `pnpm p:validate` validates the Prisma schema
+- `pnpm p:gen` generates Prisma client
+- `pnpm p:migrate` runs Prisma development migrations
+- `pnpm p:reset` resets the database with Prisma migrations
+- `pnpm p:deploy` deploys Prisma migrations
+- `pnpm p:studio` opens Prisma Studio
 
 ## Project Docs
 
-Detailed project documentation lives in [docs](./docs):
+Detailed documentation lives in [docs](./docs):
 
 - [01-project-overview.md](./docs/01-project-overview.md)
 - [02-domains.md](./docs/02-domains.md)
@@ -242,13 +231,9 @@ Detailed project documentation lives in [docs](./docs):
 - [08-project-requirements.md](./docs/08-project-requirements.md)
 - [09-api-documentation.md](./docs/09-api-documentation.md)
 
-## Suggested Reading Order
+Suggested reading order:
 
 1. [Project Overview](./docs/01-project-overview.md)
 2. [Data Model](./docs/03-data-model.md)
 3. [API Overview](./docs/05-api-overview.md)
 4. [API Documentation](./docs/09-api-documentation.md)
-
-## Goal
-
-This project is intended to demonstrate practical RBAC, real-world order lifecycle handling, modular backend structure, and a solid full-stack-ready API foundation.

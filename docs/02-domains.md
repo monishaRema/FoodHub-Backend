@@ -10,18 +10,19 @@ Files:
 
 Responsibilities:
 
-- User registration
-- Login and logout
-- Access-token refresh
-- Current-user lookup
-- Cookie-based authentication
-- Role-based authorization
+- user registration
+- login and logout
+- access-token refresh
+- current-user lookup
+- cookie-based authentication
+- role-based authorization
 
 Implementation notes:
 
 - Registration creates a user with role `CUSTOMER` by default.
 - Login stores `access-token` and `refresh-token` in `httpOnly` cookies.
 - Protected routes depend on the `access-token` cookie.
+- Login and refresh reject users whose status is not `ACTIVE`.
 
 ## 2. Public Catalog
 
@@ -32,18 +33,22 @@ Files:
 
 Responsibilities:
 
-- Browse available meals
-- Search meals by free text
-- View meal details
-- View meal reviews
-- Browse providers
-- View provider details
+- browse available meals
+- browse featured meals
+- search meals by free text
+- view meal details
+- view meal reviews
+- browse providers
+- view provider details
+- list meals by provider
 
 Implementation notes:
 
 - Public meal listing only returns meals with `availability = AVAILABLE`.
-- Meal search matches against `name`, `excerpt`, `details`, and dietary enum text.
-- Public provider lookup currently returns provider records only; it does not include the provider's meals.
+- Featured meals also require `availability = AVAILABLE`.
+- Meal search matches against `name`, `excerpt`, `details`, and dietary enum text when the search value matches an enum.
+- Public provider detail returns provider fields only.
+- Provider meals are exposed through a dedicated `GET /api/providers/:id/meals` endpoint.
 
 ## 3. Provider Operations
 
@@ -53,16 +58,17 @@ Files:
 
 Responsibilities:
 
-- Provider profile registration
-- Provider-owned meal CRUD
-- Provider order listing
-- Order status progression logic
+- provider profile registration
+- provider-owned meal CRUD
+- provider order listing
+- provider order status progression
 
 Implementation notes:
 
 - A user becomes a provider by creating a provider profile.
-- Provider meal access is scoped by the authenticated user's provider record.
-- The service contains valid status-transition rules, but the route/controller wiring for order-status update is currently inconsistent.
+- Provider meal routes require both authentication and `PROVIDER` role.
+- Provider order routes sit under the authenticated `/api/provider` mount.
+- Order status transitions are strictly enforced in service logic.
 
 ## 4. Ordering
 
@@ -72,16 +78,17 @@ Files:
 
 Responsibilities:
 
-- Order creation
-- Customer order history
-- Single-order lookup
-- Customer order cancellation
+- order creation
+- customer order history
+- single-order lookup
+- customer order cancellation
 
 Implementation notes:
 
 - Orders are restricted to meals from exactly one provider.
-- Total amount is calculated from meal prices stored in the database.
-- Order items store snapshot values for meal name and price.
+- Total amount is calculated from database prices, not client input.
+- Order items store meal name and price snapshots.
+- If a user has no orders, the current service returns a `401` instead of an empty list.
 
 ## 5. Reviews
 
@@ -91,7 +98,8 @@ Files:
 
 Responsibilities:
 
-- Review creation tied to completed purchases
+- review creation tied to completed purchases
+- review eligibility checking
 
 Implementation notes:
 
@@ -100,6 +108,7 @@ Implementation notes:
 - The order must be `DELIVERED`.
 - The reviewed meal must be part of the order.
 - Only one review per user per meal is allowed.
+- Eligibility check returns an informative `eligibility` result instead of throwing for normal ineligible states.
 
 ## 6. Admin Governance
 
@@ -107,16 +116,19 @@ Files:
 
 - `src/app/modules/user/*`
 - `src/app/modules/category/*`
+- `src/app/modules/admin-orders/*`
 
 Responsibilities:
 
-- User listing
-- User status changes
-- Category CRUD
+- user listing
+- user status changes
+- category CRUD
+- platform-wide order visibility
 
 Implementation notes:
 
 - User-management routes are mounted under `/api/admin/users`.
 - Category routes are mounted under `/api/admin/category`.
-- Category create, update, and delete are admin-only.
-- Category reads are authenticated but not admin-only in the current router.
+- Admin order routes are mounted under `/api/admin/orders`.
+- Category creation, update, and deletion are admin-only.
+- Category listing is accessible to any authenticated user because the route lacks an `authorize("ADMIN")` guard.

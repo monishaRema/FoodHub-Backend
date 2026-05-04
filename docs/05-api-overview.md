@@ -9,7 +9,14 @@
 - Protected routes require the `access-token` cookie.
 - Login sets both `access-token` and `refresh-token`.
 - Refresh token reads the `refresh-token` cookie and issues a fresh access token cookie.
-- The API does not currently use bearer-token headers in its auth middleware.
+- The API does not currently use bearer-token headers in auth middleware.
+- Cookies are `httpOnly` and `sameSite: "strict"`.
+- Cookies are `secure` only when `NODE_ENV=PROD`.
+
+## Rate Limiting
+
+- A global limiter is mounted for all routes with a 15-minute window and limit `200`.
+- An auth-specific limiter is mounted for `/api/auth` with a 15-minute window and limit `100`.
 
 ## Route Groups
 
@@ -25,13 +32,18 @@
 - `POST /auth/refresh-token`
 - `GET /auth/me`
 
-### Public catalog
+### Public meals
 
 - `GET /meals`
+- `GET /meals/featured`
 - `GET /meals/:id`
 - `GET /meals/:id/reviews`
+
+### Public providers
+
 - `GET /providers`
 - `GET /providers/:id`
+- `GET /providers/:id/meals`
 
 ### Provider area
 
@@ -42,7 +54,7 @@
 - `PATCH /provider/meals/:id`
 - `DELETE /provider/meals/:id`
 - `GET /provider/orders`
-- `GET /provider/orders/:id/status`
+- `PATCH /provider/orders/:id/status`
 
 ### Customer area
 
@@ -51,21 +63,25 @@
 - `GET /orders/:id`
 - `PATCH /orders/:id/cancel`
 - `POST /reviews`
+- `GET /reviews/eligibility/:id`
 
 ### Admin area
 
+- `GET /admin/orders`
+- `GET /admin/orders/:id`
 - `GET /admin/category`
 - `GET /admin/category/:id`
 - `POST /admin/category`
 - `PATCH /admin/category/:id`
 - `DELETE /admin/category/:id`
 - `GET /admin/users`
-- `GET /admin/users/:id/status`
+- `PATCH /admin/users/:id/status`
 
 ## Validation Patterns
 
 - Path ids are validated as UUIDs.
 - Pagination uses `page` and `limit`.
+- Public meals and providers also support `search`, `sortBy`, and `sortOrder`.
 - Validation errors return `400` with `errorDetails`.
 
 ## Success Response Shape
@@ -74,7 +90,13 @@
 {
   "success": true,
   "message": "Fetched meals successfully",
-  "data": []
+  "data": [],
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 0,
+    "totalPage": 0
+  }
 }
 ```
 
@@ -95,6 +117,6 @@
 
 ## Accuracy Notes
 
-- The current code mounts category routes under `/admin/category`, not `/admin/categories`.
-- The current code exposes user-status change as `GET /admin/users/:id/status` with a request body.
-- The current code exposes provider order-status path `GET /provider/orders/:id/status`, but the route is not currently wired to the update controller.
+- `GET /api/admin/category` is authenticated but not additionally role-guarded in the current route file.
+- `GET /api/admin/category/:id` is admin-only.
+- `GET /api/orders` currently throws `401` when the user has no orders instead of returning an empty page.

@@ -20,10 +20,13 @@
 - `cookie-parser`
 - `helmet`
 - `cors`
+- `express-rate-limit`
 
-Implementation note:
+Implementation notes:
 
-- `express-rate-limit` is installed but is not currently mounted in `src/app/app.ts`.
+- JWTs are transported in cookies rather than bearer headers.
+- `cors` is configured with `origin: config.FRONTEND_URL` and `credentials: true`.
+- A global limiter and a second auth-specific limiter are both active in `src/app/app.ts`.
 
 ## Validation
 

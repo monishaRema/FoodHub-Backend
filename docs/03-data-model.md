@@ -88,7 +88,7 @@ Relations:
 
 Behavior:
 
-- Creating a provider profile also updates the linked user's role to `PROVIDER`.
+- Creating a provider profile creates a provider row and promotes the linked user's role to `PROVIDER`.
 
 ### `Category`
 
@@ -183,7 +183,7 @@ Relations:
 
 Purpose:
 
-- Preserves name and price snapshots for historical order integrity.
+- Preserves historical meal name and price at the time of ordering.
 
 ### `Review`
 

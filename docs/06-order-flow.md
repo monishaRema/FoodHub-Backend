@@ -22,7 +22,7 @@ Cancellation:
 - `PENDING -> CANCELLED`
 - `CONFIRMED -> CANCELLED`
 
-## Provider Status Transitions in Service Logic
+## Provider Status Transitions
 
 Allowed transitions:
 
@@ -40,15 +40,19 @@ Disallowed:
 
 ## Customer Permissions
 
-- Create own orders
-- List own orders
-- Read own orders
-- Cancel own orders only while status is `PENDING` or `CONFIRMED`
+- create own orders
+- list own orders
+- read own orders
+- cancel own orders only while status is `PENDING` or `CONFIRMED`
+
+Current implementation quirk:
+
+- if the user has no orders, `GET /api/orders` currently returns `401` with an error message instead of an empty paginated response
 
 ## Provider Permissions
 
-- View orders belonging to their own provider account
-- Progress order status only through the allowed transition map in service logic
+- view orders belonging to their own provider account
+- progress order status only through the allowed transition map
 
 ## Review Dependency
 
@@ -57,7 +61,6 @@ A review can be created only if:
 - the order belongs to the current user
 - the order status is `DELIVERED`
 - the reviewed meal was included in the order
+- the user has not already reviewed that meal
 
-## Current Route Wiring Note
-
-The provider service contains status-update rules, but the route registration for `/api/provider/orders/:id/status` is currently not connected to `updateOrderStatus`. This document describes both the intended service behavior and the current routing state.
+The project also exposes `GET /api/reviews/eligibility/:id` so the client can check whether the current user may review a specific meal.

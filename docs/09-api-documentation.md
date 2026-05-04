@@ -27,6 +27,19 @@ Authentication model:
 }
 ```
 
+Paginated responses also include:
+
+```json
+{
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 42,
+    "totalPage": 5
+  }
+}
+```
+
 ### 2.2 Error Response
 
 ```json
@@ -54,6 +67,8 @@ Notes:
 - `access-token` is required for protected endpoints
 - `refresh-token` is required for token refresh
 - tokens are stored in `httpOnly` cookies
+- cookies use `sameSite: "strict"`
+- cookies use `secure: true` only in `PROD`
 
 ## 4. System Endpoint
 
@@ -61,14 +76,14 @@ Notes:
 
 Purpose:
 
-- Health check endpoint
+- health check / welcome endpoint
 
 Success response:
 
 ```json
 {
   "success": true,
-  "message": "Server running healthy"
+  "message": "Welcome to FoodHub backend server"
 }
 ```
 
@@ -78,7 +93,7 @@ Success response:
 
 Purpose:
 
-- Register a new user
+- register a new user
 
 Request body:
 
@@ -108,7 +123,7 @@ Success:
 
 Purpose:
 
-- Authenticate a user and set login cookies
+- authenticate a user and set login cookies
 
 Request body:
 
@@ -127,14 +142,15 @@ Success:
 
 Possible errors:
 
-- `401` invalid credentials
-- `403` inactive account
+- `401` no user found with this email
+- `401` invalid password
+- `403` account is not allowed to log in
 
 ### 5.3 `POST /api/auth/logout`
 
 Purpose:
 
-- Clear auth cookies
+- clear auth cookies
 
 Success:
 
@@ -144,7 +160,7 @@ Success:
 
 Purpose:
 
-- Issue a new access token from the refresh token cookie
+- issue a new access token from the refresh token cookie
 
 Success:
 
@@ -152,7 +168,7 @@ Success:
 
 Possible errors:
 
-- `401` refresh token missing
+- `401` refresh token required
 - `401` refresh token invalid or expired
 - `404` user not found
 - `403` inactive account
@@ -161,7 +177,7 @@ Possible errors:
 
 Purpose:
 
-- Return the authenticated user's safe profile data
+- return the authenticated user's profile data
 
 Authentication:
 
@@ -173,7 +189,7 @@ Authentication:
 
 Purpose:
 
-- Return paginated public meals
+- return paginated public meals
 
 Query parameters:
 
@@ -186,32 +202,43 @@ Query parameters:
 Behavior:
 
 - only meals with `availability = AVAILABLE` are returned
-- search matches `name`, `excerpt`, `details`, and dietary enum text
+- search matches `name`, `excerpt`, `details`, and dietary enum text when applicable
 
-### 6.2 `GET /api/meals/:id`
+### 6.2 `GET /api/meals/featured`
 
 Purpose:
 
-- Return one meal by UUID
+- return paginated featured public meals
+
+Query parameters:
+
+- `page?: number`, default `1`
+- `limit?: number`, default `10`, max `100`
+
+Behavior:
+
+- only meals with `isFeatured = true` and `availability = AVAILABLE` are returned
+
+### 6.3 `GET /api/meals/:id`
+
+Purpose:
+
+- return one meal by UUID
 
 Possible errors:
 
 - `404` meal not found
 
-### 6.3 `GET /api/meals/:id/reviews`
+### 6.4 `GET /api/meals/:id/reviews`
 
 Purpose:
 
-- Return reviews for a specific meal
+- return reviews for a specific meal
 
 Query parameters:
 
 - `page?: number`
 - `limit?: number`
-
-Response shape note:
-
-- public review listing returns a safe public subset of review fields
 
 Possible errors:
 
@@ -223,7 +250,7 @@ Possible errors:
 
 Purpose:
 
-- Return paginated providers
+- return paginated providers
 
 Query parameters:
 
@@ -237,12 +264,29 @@ Query parameters:
 
 Purpose:
 
-- Return one provider by UUID
+- return one provider by UUID
+
+Possible errors:
+
+- `404` no provider found
+
+### 7.3 `GET /api/providers/:id/meals`
+
+Purpose:
+
+- return meals for a single provider
+
+Query parameters:
+
+- `search?: string`
+- `page?: number`, default `1`
+- `limit?: number`, default `10`, max `100`
+- `sortBy?: createdAt | updatedAt | price | name`, default `createdAt`
+- `sortOrder?: asc | desc`, default `desc`
 
 Implementation note:
 
-- the current implementation returns provider fields only
-- it does not include the provider's meals
+- the current repository method paginates provider meals but does not apply the incoming search or sort options
 
 ## 8. Provider Endpoints
 
@@ -252,7 +296,7 @@ All `/api/provider/*` routes require authentication.
 
 Purpose:
 
-- Create a provider profile for the authenticated user
+- create a provider profile for the authenticated user
 
 Request body:
 
@@ -274,7 +318,7 @@ Rules:
 
 Purpose:
 
-- Return meals owned by the authenticated provider
+- return meals owned by the authenticated provider
 
 Authentication:
 
@@ -290,7 +334,7 @@ Query parameters:
 
 Purpose:
 
-- Return one provider-owned meal
+- return one provider-owned meal
 
 Authentication:
 
@@ -306,7 +350,7 @@ Possible errors:
 
 Purpose:
 
-- Create a meal under the authenticated provider
+- create a meal under the authenticated provider
 
 Authentication:
 
@@ -333,6 +377,7 @@ Validation rules:
 
 - `price` must be positive
 - `dietary` must be `VEG`, `NON_VEG`, or `VEGAN`
+- `excerpt` maximum length is `100`
 - `categoryId` must be a valid UUID
 - `availability` must be `AVAILABLE` or `UNAVAILABLE`
 
@@ -340,7 +385,7 @@ Validation rules:
 
 Purpose:
 
-- Update a provider-owned meal
+- update a provider-owned meal
 
 Authentication:
 
@@ -369,7 +414,7 @@ Rules:
 
 Purpose:
 
-- Delete a provider-owned meal
+- delete a provider-owned meal
 
 Authentication:
 
@@ -385,7 +430,7 @@ Rules:
 
 Purpose:
 
-- Return paginated orders for the authenticated provider
+- return paginated orders for the authenticated provider
 
 Authentication:
 
@@ -400,7 +445,7 @@ Query parameters:
 
 Purpose:
 
-- Update the status of a provider-owned order
+- update the status of a provider-owned order
 
 Authentication:
 
@@ -443,7 +488,7 @@ All `/api/orders/*` routes require authentication.
 
 Purpose:
 
-- Create an order for the authenticated user
+- create an order for the authenticated user
 
 Request body:
 
@@ -473,7 +518,7 @@ Rules:
 
 Purpose:
 
-- Return paginated orders for the authenticated user
+- return paginated orders for the authenticated user
 
 Query parameters:
 
@@ -488,7 +533,7 @@ Current implementation note:
 
 Purpose:
 
-- Return one order belonging to the authenticated user
+- return one order belonging to the authenticated user
 
 Possible errors:
 
@@ -499,7 +544,7 @@ Possible errors:
 
 Purpose:
 
-- Cancel an order belonging to the authenticated user
+- cancel an order belonging to the authenticated user
 
 Allowed current statuses:
 
@@ -512,7 +557,7 @@ Possible errors:
 - `403` order belongs to another user
 - `409` order is no longer cancellable
 
-## 10. Review Endpoint
+## 10. Review Endpoints
 
 All `/api/reviews/*` routes require authentication.
 
@@ -520,7 +565,7 @@ All `/api/reviews/*` routes require authentication.
 
 Purpose:
 
-- Create a review tied to a delivered order
+- create a review tied to a delivered order
 
 Request body:
 
@@ -543,15 +588,27 @@ Rules:
 - meal must be part of that order
 - duplicate review for the same user and meal is rejected
 
+### 10.2 `GET /api/reviews/eligibility/:id`
+
+Purpose:
+
+- check whether the authenticated user is currently allowed to review the meal identified by `:id`
+
+Response behavior:
+
+- returns an eligibility payload with `eligibility: true | false`
+- when eligible, includes the related `orderId`
+- when not eligible, includes a human-readable reason message
+
 ## 11. Admin Category Endpoints
 
-All `/api/admin/category/*` routes require authentication.
+All `/api/admin/category/*` routes require authentication through the mount.
 
 ### 11.1 `GET /api/admin/category`
 
 Purpose:
 
-- Return all categories ordered by `createdAt desc`
+- return all categories
 
 Current access behavior:
 
@@ -561,17 +618,17 @@ Current access behavior:
 
 Purpose:
 
-- Return one category by UUID
+- return one category by UUID
 
 Current access behavior:
 
-- any authenticated user can access this route
+- admin role required
 
 ### 11.3 `POST /api/admin/category`
 
 Purpose:
 
-- Create a category
+- create a category
 
 Authentication:
 
@@ -590,7 +647,7 @@ Request body:
 
 Purpose:
 
-- Update a category
+- update a category
 
 Authentication:
 
@@ -614,7 +671,7 @@ Rules:
 
 Purpose:
 
-- Delete a category
+- delete a category
 
 Authentication:
 
@@ -634,7 +691,7 @@ All `/api/admin/users/*` routes require authentication and role `ADMIN`.
 
 Purpose:
 
-- Return paginated users
+- return paginated users
 
 Query parameters:
 
@@ -645,7 +702,7 @@ Query parameters:
 
 Purpose:
 
-- Update a user's status
+- update a user's status
 
 Request body:
 
@@ -664,3 +721,32 @@ Possible errors:
 
 - `404` user not found
 - `409` user already has the requested status
+
+## 13. Admin Order Endpoints
+
+All `/api/admin/orders/*` routes require authentication and role `ADMIN`.
+
+### 13.1 `GET /api/admin/orders`
+
+Purpose:
+
+- return paginated platform-wide orders
+
+Query parameters:
+
+- `page?: number`
+- `limit?: number`
+
+Response note:
+
+- each item includes provider summary, user summary, and order items
+
+### 13.2 `GET /api/admin/orders/:id`
+
+Purpose:
+
+- return a single platform-wide order
+
+Current implementation note:
+
+- the service returns repository output directly and does not throw a custom `404` when the order is missing
