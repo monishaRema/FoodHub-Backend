@@ -16,14 +16,18 @@ import { adminOrdersRouter } from '../modules/admin-orders/admin-order.routes.js
 
 export const router = Router()
 
-
 router.get("/", (_req:Request,res:Response) => {
 
    sendResponse({
     res,
-    statusCode:200,
-    message:"Welcome to FoodHub backend server"
-   })
+    statusCode: 200,
+    message: "FoodHub API is operational",
+    data: {
+      version: "v1",
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+    },
+  });
 })
 
 router.use("/auth",authRouter)
