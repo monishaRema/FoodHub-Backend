@@ -87,7 +87,7 @@ export const ordersService = {
     const skip = (page - 1) * limit;
 
     const orders = await ordersRepo.getOrders(userId, limit, skip);
-    if (orders.length == 0) {
+    if (orders.data.length == 0) {
       throw new AppError(401, "YOu didn't create any order yet");
     }
 
