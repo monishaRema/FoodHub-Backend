@@ -23,26 +23,30 @@ export const authController = {
   login: async (req: Request, res: Response) => {
     const result = await authService.login(req.body);
 
-    setCookie(
-      res,
-      cookieNames.refreshToken,
-      result.refreshToken,
-      7 * 24 * 60 * 60 * 1000,
-    );
-    setCookie(res, cookieNames.accessToken, result.accessToken, 60 * 60 * 1000);
+    // setCookie(
+    //   res,
+    //   cookieNames.refreshToken,
+    //   result.refreshToken,
+    //   7 * 24 * 60 * 60 * 1000,
+    // );
+    // setCookie(res, cookieNames.accessToken, result.accessToken, 60 * 60 * 1000);
 
     sendResponse({
       res,
       statusCode: 200,
       message: "User logged in successfully",
-      data: result.user,
+      data: {
+        user: result.user,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      },
     });
   },
 
   // Logout
   logout: async (_req: Request, res: Response) => {
-    clearCookie(res, cookieNames.accessToken);
-    clearCookie(res, cookieNames.refreshToken);
+    // clearCookie(res, cookieNames.accessToken);
+    // clearCookie(res, cookieNames.refreshToken);
 
     sendResponse({
       res,
@@ -61,7 +65,7 @@ export const authController = {
 
     const accessToken = await authService.refreshToken(refreshToken)
 
-    setCookie(res, cookieNames.accessToken, accessToken, 60 * 60 * 1000)
+    // setCookie(res, cookieNames.accessToken, accessToken, 60 * 60 * 1000)
 
     sendResponse({
       res,

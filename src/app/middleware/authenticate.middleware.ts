@@ -11,11 +11,22 @@ export const authenticate = (
   _res: Response,
   next: NextFunction,
 ) => {
-  const accessToken = req.cookies[cookieNames.accessToken];
 
+  // const accessToken = req.cookies[cookieNames.accessToken];
+
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return next(new AppError(401, "Access token required"));
+  }
+
+  const accessToken = authHeader.split(" ")[1];
+  
   if (!accessToken) {
     return next(new AppError(401, "Access token required"));
   }
+
+
 
   try {
     const decoded = jwt.verify(

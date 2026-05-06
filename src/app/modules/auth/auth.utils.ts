@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { CookieOptions, Response } from "express";
 import { config } from "../../config/env.js";
 import { JwtPayload } from "./auth.types.js";
 import jwt from "jsonwebtoken";
@@ -25,24 +25,27 @@ export const generateRefreshToken = (payload: JwtPayload) => {
   return jwt.sign(payload, config.JWT_REFRESH_TOKEN_SECRET, options);
 };
 
+const isSecure = config.BACKEND_BASE_URL?.startsWith("https://") ?? false;
+
+const cookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: isSecure,
+  sameSite: isSecure ? "none" : "lax",
+  path: "/",
+};
+
 export const setCookie = (
   res: Response,
-  cookieName:CookieNameValue,
+  cookieName: CookieNameValue,
   token: string,
   age: number,
 ) => {
   res.cookie(cookieName, token, {
-    httpOnly: true,
-    secure: config.isProduction,
-    sameSite: "strict",
+    ...cookieOptions,
     maxAge: age,
   });
 };
 
 export const clearCookie = (res: Response, cookieName: CookieNameValue) => {
-  res.clearCookie(cookieName, {
-    httpOnly: true,
-    secure: config.isProduction,
-    sameSite: "strict",
-  });
+  res.clearCookie(cookieName, cookieOptions);
 };

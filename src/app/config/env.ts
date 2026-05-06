@@ -16,6 +16,7 @@ const envSchema = z.object({
   JWT_ACCESS_TOKEN_EXPIRED_IN: z.string().default("3d"),
   BCRYPT_SALT_ROUNDS: z.coerce.number().int().positive().default(10),
   FRONTEND_URL: z.string().min(1, "Frontend Url is required"),
+  BACKEND_BASE_URL: z.string().min(1, "Backend Base Url is required"),
   isProduction: z.boolean().optional().default(false),
 });
 
